@@ -1,0 +1,80 @@
+---
+// The select rail: the six lessons as frames on one perforated strip. The current lesson is the
+// punched white frame with the folded flag. On pages that are not a lesson, the flag marks the
+// lesson the reader opened last (remembered only in their own browser).
+import { STRINGS, type Locale } from '../i18n';
+import { shortTitle, slugOf, type Lesson } from '../lessons';
+
+interface Props {
+  locale: Locale;
+  lessons: Lesson[];
+  current?: string;
+}
+
+const { locale, lessons, current } = Astro.props;
+const t = STRINGS[locale];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<nav class="rail" aria-label={t.railLabel} data-current={current ?? ''}>
+  <div class="wrap">
+    <ol class="frames">
+      {lessons.map((lesson) => {
+        const slug = slugOf(lesson);
+        return (
+          <li>
+            <a
+              class="frame"
+              href={`${base}/${locale}/lessons/${slug}/`}
+              data-slug={slug}
+              aria-current={slug === current ? 'page' : undefined}
+            >
+              <svg class="flag" viewBox="0 0 26 46" aria-hidden="true">
+                <path d="M0 0h26v46L13 36 0 46Z" fill="currentColor" />
+                <path d="M0 0h26v8H0Z" fill="#0a0a0a" opacity=".18" />
+              </svg>
+              <span class="n">{pad(lesson.data.order)}</span>
+              <span class="name">{shortTitle(lesson)}</span>
+            </a>
+          </li>
+        );
+      })}
+    </ol>
+    <p class="rail-note" hidden data-label={t.continueAt}></p>
+  </div>
+</nav>
+
+<script>
+  // Remembers the last lesson opened and flags it on the other pages. Browser storage is a
+  // per-reader convenience: when it is blocked, the rail simply shows no flag.
+  const rail = document.querySelector<HTMLElement>('.rail');
+  if (rail) {
+    const current = rail.dataset.current;
+    try {
+      if (current) {
+        localStorage.setItem('lastLesson', current);
+      } else {
+        const last = localStorage.getItem('lastLesson');
+        const frame = last
+          ? rail.querySelector<HTMLAnchorElement>(`.frame[data-slug="${CSS.escape(last)}"]`)
+          : null;
+        const note = rail.querySelector<HTMLElement>('.rail-note');
+        if (frame && note) {
+          frame.dataset.stopped = '';
+          const link = document.createElement('a');
+          link.href = frame.href;
+          link.textContent = `${frame.querySelector('.n')?.textContent} ${frame.querySelector('.name')?.textContent}`;
+          note.append(`${note.dataset.label} `, link);
+          note.hidden = false;
+        }
+      }
+    } catch {
+      // Storage unavailable (private window, blocked site data): nothing to remember.
+    }
+    // On a phone the strip scrolls sideways: bring the current frame into view.
+    rail
+      .querySelector('.frame[aria-current="page"]')
+      ?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
+</script>

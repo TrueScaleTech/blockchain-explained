@@ -1,0 +1,55 @@
+---
+import Rail from '../../components/Rail.astro';
+import Base from '../../layouts/Base.astro';
+import { LOCALES, STRINGS, type Locale } from '../../i18n';
+import { getLessons, slugOf } from '../../lessons';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const locale = Astro.params.lang as Locale;
+const t = STRINGS[locale];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const lessons = await getLessons(locale);
+const first = lessons[0];
+const pad = (n: number) => String(n).padStart(2, '0');
+// The second word of the title takes the signal colour: "Blockchain explained".
+const [head, ...rest] = t.siteTitle.split(' ');
+---
+
+<Base locale={locale} path="" current="lessons">
+  <Rail slot="rail" locale={locale} lessons={lessons} />
+  <div class="window">
+    <section class="index-intro">
+      <h1 class="lead-title">
+        {head} <span>{rest.join(' ')}</span>
+      </h1>
+      <div>
+        <p>{t.intro}</p>
+        {first && (
+          <div class="actions">
+            <a class="btn" href={`${base}/${locale}/lessons/${slugOf(first)}/`}>
+              {t.start}
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+    <h2 class="sr-only">{t.lessonsHeading}</h2>
+    <ol class="reel">
+      {lessons.map((lesson) => (
+        <li>
+          <a href={`${base}/${locale}/lessons/${slugOf(lesson)}/`}>
+            <span class="n">{pad(lesson.data.order)}</span>
+            <h3>{lesson.data.title}</h3>
+            <span class="go" aria-hidden="true">
+              {t.open} →
+            </span>
+            <p>{lesson.data.summary}</p>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</Base>

@@ -4,3 +4,8 @@
 *.log
 .env*
 .DS_Store
+# Design-tool scratch: decision sketches, catalog reference images and review captures.
+/.impeccable/mocks/
+/.impeccable/decision/
+/.impeccable/reference/
+/.impeccable/review/

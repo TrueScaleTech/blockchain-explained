@@ -1,0 +1,29 @@
+---
+import Rail from '../../components/Rail.astro';
+import Base from '../../layouts/Base.astro';
+import { LOCALES, STRINGS, type Locale } from '../../i18n';
+import { getLessons } from '../../lessons';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const locale = Astro.params.lang as Locale;
+const t = STRINGS[locale];
+const lessons = await getLessons(locale);
+---
+
+<Base locale={locale} path="about/" current="about" title={t.aboutTitle}>
+  <Rail slot="rail" locale={locale} lessons={lessons} />
+  <div class="window about">
+    <header class="opener">
+      <h1>{t.aboutTitle}</h1>
+    </header>
+    {t.aboutSections.map((section) => (
+      <section>
+        <h2>{section.heading}</h2>
+        <p>{section.body}</p>
+      </section>
+    ))}
+  </div>
+</Base>
