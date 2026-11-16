@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The workflow only reads the repository; nothing here needs write access.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: ${{ matrix.os }} / Node ${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: ['22', '24']
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Type check and content schema
+        run: npm run check
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The pages may load nothing from another origin and may contain no inline script:
+      # the Content-Security-Policy allows only the site's own files. Plain links (<a href>)
+      # to the cited sources are fine, they load nothing until clicked. The root page only
+      # redirects to a language and carries no policy, so it is left out of the script check.
+      - name: Built site loads only its own files
+        shell: bash
+        run: |
+          loaded=$(grep -rhoE '<(script|iframe|img|embed|object|source|video|audio|link)\b[^>]*(src|href)="(https?:)?//[^"]+"' dist --include=*.html || true)
+          if [ -n "$loaded" ]; then
+            echo "A page loads a resource from another origin:" >&2
+            echo "$loaded" >&2
+            exit 1
+          fi
+          inline=$(grep -rlE '<script(\s+type="module")?\s*>' dist --include=*.html | grep -v '^dist/index.html$' || true)
+          if [ -n "$inline" ]; then
+            echo "A page contains an inline script, which the CSP would block:" >&2
+            echo "$inline" >&2
+            exit 1
+          fi

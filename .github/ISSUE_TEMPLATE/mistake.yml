@@ -1,0 +1,23 @@
+name: Mistake in a lesson
+description: Something in a lesson or a widget is wrong, unclear or outdated.
+labels: [content]
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson
+      description: Number and language, for example "03, Italian".
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong?
+      description: Quote the sentence or describe what the widget shows, and what it should say or show.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A primary source that supports the correction (specification, paper, official documentation), if you have one.
