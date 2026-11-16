@@ -1,5 +1,4 @@
 ---
-import Rail from '../../components/Rail.astro';
 import Base from '../../layouts/Base.astro';
 import { LOCALES, STRINGS, type Locale } from '../../i18n';
 import { getLessons, slugOf } from '../../lessons';
@@ -14,27 +13,38 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const lessons = await getLessons(locale);
 const first = lessons[0];
 const pad = (n: number) => String(n).padStart(2, '0');
-// The second word of the title takes the signal colour: "Blockchain explained".
-const [head, ...rest] = t.siteTitle.split(' ');
 ---
 
 <Base locale={locale} path="" current="lessons">
-  <Rail slot="rail" locale={locale} lessons={lessons} />
-  <div class="window">
-    <section class="index-intro">
-      <h1 class="lead-title">
-        {head} <span>{rest.join(' ')}</span>
-      </h1>
+  <article>
+    <dl class="hdr">
       <div>
-        <p>{t.intro}</p>
-        {first && (
-          <div class="actions">
-            <a class="btn" href={`${base}/${locale}/lessons/${slugOf(first)}/`}>
-              {t.start}
-            </a>
-          </div>
-        )}
+        <dt>{t.hdrSeries}</dt>
+        <dd>{t.siteTitle}</dd>
       </div>
+      <div>
+        <dt>{t.hdrCategory}</dt>
+        <dd>{t.hdrCategoryValue}</dd>
+      </div>
+      <div>
+        <dt>{t.contents}</dt>
+        <dd>{pad(lessons.length)}</dd>
+      </div>
+      <div>
+        <dt>{t.hdrLanguage}</dt>
+        <dd>{t.hdrLanguageValue}</dd>
+      </div>
+    </dl>
+    <section class="lead">
+      <h1>
+        <span class="index-title">{t.siteTitle}</span>
+      </h1>
+      <p>{t.intro}</p>
+      {first && (
+        <a class="btn" href={`${base}/${locale}/lessons/${slugOf(first)}/`}>
+          {t.start}
+        </a>
+      )}
     </section>
     <h2 class="sr-only">{t.lessonsHeading}</h2>
     <ol class="reel">
@@ -51,5 +61,5 @@ const [head, ...rest] = t.siteTitle.split(' ');
         </li>
       ))}
     </ol>
-  </div>
+  </article>
 </Base>

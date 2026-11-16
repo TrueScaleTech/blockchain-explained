@@ -1,0 +1,92 @@
+---
+// The contents list: the six lessons in order, and on a lesson page the numbered sections of the
+// lesson itself. The current lesson carries the amber rule; lessons already behind the reader
+// dim. On the other pages the lesson the reader opened last is flagged (remembered only in
+// their own browser).
+import { STRINGS, type Locale } from '../i18n';
+import { shortTitle, slugOf, type Lesson } from '../lessons';
+
+interface Props {
+  locale: Locale;
+  lessons: Lesson[];
+  current?: string;
+  sections?: { slug: string; text: string }[];
+}
+
+const { locale, lessons, current, sections = [] } = Astro.props;
+const t = STRINGS[locale];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const pad = (n: number) => String(n).padStart(2, '0');
+const currentOrder = lessons.find((l) => slugOf(l) === current)?.data.order;
+const ln = String(currentOrder ?? '');
+---
+
+<nav class="toc" aria-label={t.railLabel} data-current={current ?? ''}>
+  <h2>{t.contents}</h2>
+  <ol class="lessons">
+    {lessons.map((lesson) => {
+      const slug = slugOf(lesson);
+      return (
+        <li>
+          <a
+            href={`${base}/${locale}/lessons/${slug}/`}
+            data-slug={slug}
+            class:list={[currentOrder && lesson.data.order < currentOrder && 'past']}
+            aria-label={`${pad(lesson.data.order)} ${shortTitle(lesson)}`}
+            aria-current={slug === current ? 'page' : undefined}
+          >
+            <span class="n">{pad(lesson.data.order)}</span>
+            <span class="name">{shortTitle(lesson)}</span>
+          </a>
+        </li>
+      );
+    })}
+  </ol>
+  {sections.length > 0 && (
+    <>
+      <h2 class="sections-title">{t.inLesson}</h2>
+      <ol class="sections">
+        {sections.map((section, i) => (
+          <li>
+            <a href={`#${section.slug}`}>
+              <span class="n">
+                {ln}.{i + 1}
+              </span>
+              <span class="name">{section.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+  <p class="toc-note" hidden data-label={t.continueAt}></p>
+</nav>
+
+<script>
+  // Remembers the last lesson opened and points to it from the other pages. Browser storage is a
+  // per-reader convenience: when it is blocked, the contents simply show no pointer.
+  const toc = document.querySelector<HTMLElement>('.toc');
+  if (toc) {
+    const current = toc.dataset.current;
+    try {
+      if (current) {
+        localStorage.setItem('lastLesson', current);
+      } else {
+        const last = localStorage.getItem('lastLesson');
+        const link = last
+          ? toc.querySelector<HTMLAnchorElement>(`.lessons a[data-slug="${CSS.escape(last)}"]`)
+          : null;
+        const note = toc.querySelector<HTMLElement>('.toc-note');
+        if (link && note) {
+          const a = document.createElement('a');
+          a.href = link.href;
+          a.textContent = `${link.querySelector('.n')?.textContent} ${link.querySelector('.name')?.textContent}`;
+          note.append(`${note.dataset.label} `, a);
+          note.hidden = false;
+        }
+      }
+    } catch {
+      // Storage unavailable (private window, blocked site data): nothing to remember.
+    }
+  }
+</script>

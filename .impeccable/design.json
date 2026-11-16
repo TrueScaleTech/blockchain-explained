@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-16T00:00:00Z",
+  "title": "Design System: Blockchain Explained",
+  "extensions": {
+    "colorMeta": {
+      "amber": { "role": "primary", "displayName": "Marker Amber", "canonical": "#ffb81c", "tonalRamp": ["#3d2a00", "#6b4a00", "#a76f00", "#d99400", "#ffb81c", "#ffca52", "#ffdc8a", "#fff0cc"] },
+      "ground": { "role": "neutral", "displayName": "Cool Paper", "canonical": "#f4f5f7", "tonalRamp": ["#101418", "#2b323d", "#4a5260", "#7b8391", "#a9b0bd", "#c9ccd3", "#eceef2", "#f4f5f7"] },
+      "ink": { "role": "neutral", "displayName": "Spec Ink", "canonical": "#101418", "tonalRamp": ["#101418", "#1c2129", "#2b323d", "#4a5260", "#626a78", "#7b8391", "#a9b0bd", "#c9ccd3"] },
+      "fail": { "role": "status", "displayName": "Check Vermilion", "canonical": "#b3261e", "tonalRamp": ["#3d0d0a", "#6a1712", "#8f1f19", "#b3261e", "#d9534a", "#ff8a7a", "#ffb9ae", "#ffe3de"] },
+      "ok": { "role": "status", "displayName": "Check Green", "canonical": "#0a6b43", "tonalRamp": ["#032a1b", "#064a2e", "#0a6b43", "#1f9060", "#3fb97f", "#5fd99a", "#a2ecc6", "#dcf8ea"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Lesson title, one per page; Archivo width 88%." },
+      "headline": { "displayName": "Headline", "purpose": "Numbered section headings with a mono lesson.section number." },
+      "title": { "displayName": "Title", "purpose": "Subsections, pager destinations, reel entries." },
+      "body": { "displayName": "Body", "purpose": "Lesson prose in Source Serif 4 at 66ch." },
+      "data": { "displayName": "Data", "purpose": "Hash and number readouts in tabular mono." },
+      "label": { "displayName": "Label", "purpose": "Uppercase mono labels, status words, figure titles." }
+    },
+    "shadows": [
+      { "name": "none", "value": "none", "purpose": "The system is flat; depth comes from ground steps and rules." },
+      { "name": "status-ring", "value": "inset 0 0 0 1px currentColor", "purpose": "Inset ring on the failed-state status glyph only." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Single easing for every transition and keyframe." },
+      { "name": "rule-draw", "value": "background-size 0.35s var(--ease-out)", "purpose": "Amber rule drawing under contents and pager items." },
+      { "name": "link-cascade", "value": "0.3s with calc(var(--d) * 90ms) stagger", "purpose": "A broken link cascades block by block down the chain." },
+      { "name": "seal", "value": "0.6s ease-out, border and ground flash from amber", "purpose": "A re-mined block is sealed once." },
+      { "name": "proof-trace", "value": "0.4s per level, calc(var(--lv) * 150ms) stagger", "purpose": "Merkle proof path traces leaf to root." },
+      { "name": "curve-draw", "value": "stroke-dashoffset 0.55s var(--ease-out)", "purpose": "Attack chart curve draws on first scroll into view." },
+      { "name": "reduced-motion", "value": "animation: none; transition: none", "purpose": "All motion is off under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "narrow-hdr", "value": "36rem" },
+      { "name": "stack-frame", "value": "56rem" },
+      { "name": "third-column", "value": "88rem" },
+      { "name": "figure-2col", "value": "30rem (container)" },
+      { "name": "figure-4col", "value": "44rem (container)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled square action; amber only while busy.",
+      "html": "<button class=\"ds-btn\">Mine block</button>",
+      "css": ".ds-btn{font:600 0.8125rem/1 var(--mono,monospace);text-transform:uppercase;letter-spacing:0.08em;min-height:44px;padding:10px 20px;color:var(--ground,#f4f5f7);background:var(--ink,#101418);border:1px solid var(--ink,#101418);border-radius:0;cursor:pointer;transition:background-color .2s cubic-bezier(.16,1,.3,1)}.ds-btn:hover{background:var(--quiet,#4a5260);border-color:var(--quiet,#4a5260)}.ds-btn:focus-visible{outline:2px solid var(--ink,#101418);outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action: ink outline on transparent.",
+      "html": "<button class=\"ds-ghost\">Reset</button>",
+      "css": ".ds-ghost{font:600 0.8125rem/1 var(--mono,monospace);text-transform:uppercase;letter-spacing:0.08em;min-height:44px;padding:10px 20px;color:var(--ink,#101418);background:transparent;border:1px solid var(--ink,#101418);border-radius:0;cursor:pointer}.ds-ghost:hover{background:var(--well,#eceef2)}.ds-ghost:focus-visible{outline:2px solid var(--ink,#101418);outline-offset:3px}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Square choice control; the chosen one takes the amber marker.",
+      "html": "<button class=\"ds-chip\">A</button> <button class=\"ds-chip\" aria-pressed=\"true\">B</button>",
+      "css": ".ds-chip{min-width:48px;min-height:40px;padding:6px 12px;font:600 0.8125rem/1 var(--mono,monospace);letter-spacing:0.06em;color:var(--ink,#101418);background:transparent;border:1px solid var(--ink,#101418);border-radius:0;cursor:pointer}.ds-chip:hover{background:var(--mark-bg,#e4e7ec)}.ds-chip[aria-pressed='true']{background:var(--amber,#ffb81c);border-color:var(--amber,#ffb81c);color:var(--on-amber,#101418)}.ds-chip:focus-visible{outline:2px solid var(--ink,#101418);outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Square mono field with an uppercase label above.",
+      "html": "<label class=\"ds-label\">Message</label><input class=\"ds-field\" type=\"text\" value=\"hello\">",
+      "css": ".ds-label{display:block;margin:0 0 6px;font:500 0.72rem/1.3 var(--mono,monospace);text-transform:uppercase;letter-spacing:0.1em;color:var(--quiet,#4a5260)}.ds-field{width:100%;font:500 1rem/1.4 var(--mono,monospace);color:var(--ink,#101418);background:var(--paper,#fff);border:1px solid var(--line,#7b8391);border-radius:0;padding:11px 13px}.ds-field:focus-visible{outline:2px solid var(--ink,#101418);outline-offset:2px;border-color:var(--ink,#101418)}"
+    },
+    {
+      "name": "Masthead Nav",
+      "kind": "nav",
+      "refersTo": "figure-bar",
+      "description": "Ink bar with brand left and mono links right; current page takes a 2px amber underline.",
+      "html": "<div class=\"ds-mast\"><span class=\"ds-brand\">Blockchain Explained</span><nav><a class=\"ds-cur\" href=\"#\">Lessons</a><a href=\"#\">About</a></nav></div>",
+      "css": ".ds-mast{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;background:var(--bar,#101418);color:var(--on-bar,#f4f5f7)}.ds-brand{font:700 1rem/1 var(--display,Arial,sans-serif);font-stretch:92%;text-transform:uppercase;letter-spacing:0.04em}.ds-mast nav{display:flex;gap:22px;font:500 0.8125rem/1 var(--mono,monospace);text-transform:uppercase;letter-spacing:0.08em}.ds-mast a{padding:10px 0;color:inherit;text-decoration:none;border-bottom:2px solid transparent}.ds-mast a:hover,.ds-mast a.ds-cur{border-bottom-color:var(--amber,#ffb81c)}"
+    },
+    {
+      "name": "Contents Item",
+      "kind": "nav",
+      "refersTo": "readout",
+      "description": "Numbered mono list; the current lesson carries a full-width amber rule, finished ones dim.",
+      "html": "<ol class=\"ds-toc\"><li><a class=\"ds-past\" href=\"#\"><span>01</span>Hashing</a></li><li><a aria-current=\"page\" href=\"#\"><span>02</span>Blocks and chain</a></li><li><a href=\"#\"><span>03</span>Mining</a></li></ol>",
+      "css": ".ds-toc{list-style:none;margin:0;padding:0;font:400 0.8125rem/1.5 var(--mono,monospace)}.ds-toc a{display:flex;gap:10px;padding:4px 0 5px;color:var(--quiet,#4a5260);text-decoration:none;background:linear-gradient(var(--amber,#ffb81c),var(--amber,#ffb81c)) 0 100%/0 3px no-repeat;transition:background-size .35s cubic-bezier(.16,1,.3,1),color .2s}.ds-toc a:hover{color:var(--ink,#101418);background-size:100% 3px}.ds-toc a[aria-current='page']{color:var(--ink,#101418);font-weight:700;background-size:100% 3px}.ds-toc a.ds-past{color:var(--past,#626a78)}"
+    },
+    {
+      "name": "Figure",
+      "kind": "card",
+      "refersTo": "figure",
+      "description": "Numbered operable figure: ink caption bar over a paper body with a mono readout.",
+      "html": "<div class=\"ds-fig\"><div class=\"ds-bar\"><span class=\"ds-no\">Fig 1</span>SHA-256</div><div class=\"ds-body\"><div class=\"ds-out\">e3b0c4<mark>42</mark>98fc1c14</div></div></div>",
+      "css": ".ds-fig{background:var(--paper,#fff);color:var(--ink,#101418);border:1px solid var(--ink,#101418)}.ds-bar{padding:9px 16px;background:var(--bar,#101418);color:var(--on-bar,#f4f5f7);font:500 0.78rem/1.4 var(--mono,monospace);text-transform:uppercase;letter-spacing:0.1em}.ds-no{margin-right:.8em;padding:1px 6px;border:1px solid currentColor}.ds-body{padding:16px}.ds-out{padding:10px 12px;background:var(--well,#eceef2);border:1px solid var(--rule,#c9ccd3);font:500 0.95rem/1.55 var(--mono,monospace);word-break:break-all}.ds-out mark{background:var(--amber,#ffb81c);color:var(--on-amber,#101418)}"
+    },
+    {
+      "name": "Chain Block (failed)",
+      "kind": "custom",
+      "refersTo": "block",
+      "description": "A block whose proof fails: vermilion border, hatch overlay and a word, never colour alone.",
+      "html": "<div class=\"ds-block\"><span class=\"ds-status\">Invalid</span><dl><dt>Hash</dt><dd>00a3f1...9c</dd></dl></div>",
+      "css": ".ds-block{position:relative;padding:12px;background:var(--well,#eceef2);border:1px solid var(--fail,#b3261e)}.ds-block::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(135deg,transparent 0 7px,color-mix(in srgb,var(--fail,#b3261e) 40%,transparent) 7px 8px)}.ds-block>*{position:relative}.ds-status{display:inline-flex;align-items:center;gap:6px;font:600 0.72rem/1 var(--mono,monospace);text-transform:uppercase;letter-spacing:0.08em;color:var(--fail,#b3261e)}.ds-status::before{content:'';width:8px;height:8px;background:repeating-linear-gradient(135deg,currentColor 0 2px,transparent 2px 4px);box-shadow:inset 0 0 0 1px currentColor}.ds-block dl{margin:8px 0 0;font:500 0.82rem/1.3 var(--mono,monospace)}.ds-block dt{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--quiet,#4a5260)}.ds-block dd{margin:0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Protocol Spec",
+    "overview": "Each lesson is set as a short specification in the manner of an IETF document: a header block of facts, a contents list, numbered sections (3.1, 3.2), a figure that can be operated, and the simplifications stated as the lesson's considerations. The page is a cool paper ground with ink text, flat, ruled and square. It reads as careful, calm and professional work, never as a docs template with a grey card and a blue accent, and never as a dark neon crypto landing.\n\nOne amber marker carries all emphasis, and it only ever means two things: where you are, or what changed. Everything else is ink on paper. A failed check is vermilion plus a hatch pattern plus a word, so state never rests on colour alone. Motion is short and computing-flavoured: digits resolve, links cascade, a nonce settles like an odometer, a proof path traces upward.\n\nThe system holds in a light and a dark theme from the same token names; dark follows the system preference until the reader uses the toggle, and the toggle always wins. Nothing loads from another origin; every face is self-hosted.",
+    "keyCharacteristics": [
+      "Flat, ruled, square: 1px and 2px ink rules, no shadows, no rounded corners.",
+      "Three voices: compact grotesque for headings, serif for reading, mono for data, labels and the header block.",
+      "One amber marker, reserved for \"where you are\" and \"what changed\".",
+      "Failed state is a hatch pattern plus a word, never colour alone.",
+      "Layout is a three-column document: contents, reading column near 66ch, key points."
+    ],
+    "rules": [
+      { "name": "The Marker Rule", "body": "Amber means \"where you are\" or \"what changed\" and nothing else. It is never a button fill, a decoration or a brand wash. A new surface that wants emphasis uses ink weight or an ink rule.", "section": "colors" },
+      { "name": "The Hatch Rule", "body": "Failure is the diagonal hatch (135deg, 1px lines every 8px in 40% vermilion) plus a word such as the block status. Colour alone is never the signal.", "section": "colors" },
+      { "name": "The Three Voices Rule", "body": "Grotesque for headings, serif for reading, mono for data and labels. Running text is never mono, and headings are never serif.", "section": "typography" },
+      { "name": "The Flat Paper Rule", "body": "Surfaces are separated by ground step or by an ink or hairline rule. No drop shadows, no blur, no glow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reserve amber (#ffb81c) for \"where you are\" and \"what changed\", and set text on it in #101418.",
+      "Do pair every failed state with the hatch pattern and a word, and every pass with a text status.",
+      "Do keep controls, fields, chips and figures at 0 radius, with 1px or 2px ink and hairline rules for separation.",
+      "Do set hashes, numbers, labels and the header block in JetBrains Mono with tabular numerals; set reading text in Source Serif 4 at 66ch.",
+      "Do keep motion under 600ms with the ease-out curve cubic-bezier(0.16, 1, 0.3, 1), and switch it all off under `prefers-reduced-motion`.",
+      "Do define any new colour as a token in both the light and the dark set, and check contrast in both.",
+      "Do self-host every face and asset; nothing loads from another origin."
+    ],
+    "donts": [
+      "Don't use amber as a button fill, a card wash, a decoration or a brand colour; it is a marker.",
+      "Don't convey state with colour alone.",
+      "Don't add shadows, blur, gradients (beyond the amber rule and the hatch) or rounded corners.",
+      "Don't set running text in mono or headings in serif.",
+      "Don't return to the white docs page with a grey widget card and a blue accent, or to a dark neon crypto look.",
+      "Don't add dotted leaders or page numbers to the contents.",
+      "Don't add prices, market data or coin imagery; this is an explainer of the mechanism."
+    ]
+  }
+}

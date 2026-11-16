@@ -101,7 +101,7 @@ const qLabel = (q: number) => `q = ${new Intl.NumberFormat(locale).format(q)}`;
           </text>
         </>
       ))}
-      <path class="current-line" d={attackPath(START_Q)}></path>
+      <path class="current-line" d={attackPath(START_Q)} pathLength="100"></path>
       {point && <circle class="current-point" cx={point.cx} cy={point.cy} r="6" />}
     </svg>
   </figure>
@@ -111,7 +111,7 @@ const qLabel = (q: number) => `q = ${new Intl.NumberFormat(locale).format(q)}`;
   import { attackPath, attackPoint, percent } from '../../lib/charts';
   import { attackerSuccessProbability, confirmationsNeeded } from '../../lib/nakamoto';
   import type { WidgetStrings } from '../../widget-strings';
-  import { $, fill, goLive, numberFormat, widgets } from './client';
+  import { $, fill, goLive, numberFormat, whenVisible, widgets } from './client';
 
   for (const { root, s } of widgets<WidgetStrings['attack']>('attack')) {
     const qInput = $<HTMLInputElement>(root, '.q');
@@ -158,5 +158,9 @@ const qLabel = (q: number) => `q = ${new Intl.NumberFormat(locale).format(q)}`;
     zInput.addEventListener('input', update);
     goLive(root);
     update();
+    // The curve draws itself once, when the figure first scrolls into view.
+    const chart = $(root, '.chart');
+    chart.classList.add('armed');
+    whenVisible(chart, () => requestAnimationFrame(() => chart.classList.add('drawn')));
   }
 </script>

@@ -62,12 +62,15 @@ const rootHex = toHex(rootOf(levels));
           y1={edge.from.y - NODE.height / 2}
           x2={edge.to.x}
           y2={edge.to.y + NODE.height / 2}
+          pathLength="100"
+          style={`--lv: ${edge.from.level}`}
         />
       ))}
       {layout.nodes.map((node) => (
         <g
           class:list={['node', roleOf(node.level, node.index), node.ghost && 'ghost']}
           transform={`translate(${node.x - NODE.width / 2} ${node.y - NODE.height / 2})`}
+          style={`--lv: ${node.level}`}
         >
           <rect width={NODE.width} height={NODE.height} />
           <text x={NODE.width / 2} y={NODE.height / 2 + 4} text-anchor="middle">
@@ -153,7 +156,9 @@ const rootHex = toHex(rootOf(levels));
           y1: edge.from.y - NODE.height / 2,
           x2: edge.to.x,
           y2: edge.to.y + NODE.height / 2,
+          pathLength: 100,
         });
+        line.style.setProperty('--lv', String(edge.from.level));
         line.classList.add('edge');
         if (role(edge.from.level, edge.from.index) === 'on-path') line.classList.add('on-path');
         if (edge.from.ghost) line.classList.add('ghost');
@@ -164,6 +169,7 @@ const rootHex = toHex(rootOf(levels));
           transform: `translate(${node.x - NODE.width / 2} ${node.y - NODE.height / 2})`,
         });
         g.classList.add('node');
+        g.style.setProperty('--lv', String(node.level));
         const r = role(node.level, node.index);
         if (r) g.classList.add(r);
         if (node.ghost) g.classList.add('ghost');

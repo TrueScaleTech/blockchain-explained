@@ -1,7 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Note from '../../../components/Note.astro';
-import Rail from '../../../components/Rail.astro';
+import Contents from '../../../components/Contents.astro';
 import { WIDGET_COMPONENTS } from '../../../components/widgets';
 import Base from '../../../layouts/Base.astro';
 import { LOCALES, STRINGS, type Locale } from '../../../i18n';
@@ -33,9 +33,14 @@ const locale = Astro.params.lang as Locale;
 const t = STRINGS[locale];
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const slug = slugOf(lesson);
-const { Content } = await render(lesson);
+const { Content, headings } = await render(lesson);
+const sections = headings.filter((h) => h.depth === 2).map((h) => ({ slug: h.slug, text: h.text }));
 const Widget = WIDGET_COMPONENTS[lesson.data.widget];
 const pad = (n: number) => String(n).padStart(2, '0');
+const limits = sections.find((s) => t.limitsSlugs.includes(s.slug));
+const edition = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(
+  new Date(),
+);
 const href = (l: Lesson) => `${base}/${locale}/lessons/${slugOf(l)}/`;
 ---
 
@@ -46,26 +51,68 @@ const href = (l: Lesson) => `${base}/${locale}/lessons/${slugOf(l)}/`;
   title={lesson.data.title}
   description={lesson.data.summary}
 >
-  <Rail slot="rail" locale={locale} lessons={lessons} current={slug} />
-  <article class="window">
-    <header class="opener">
-      <p class="where">{t.lessonOf(lesson.data.order, lessons.length)}</p>
+  <Contents slot="contents" locale={locale} lessons={lessons} current={slug} sections={sections} />
+  <article class="spec" style={`--ln: '${lesson.data.order}'`}>
+    <header>
+      <dl class="hdr">
+        <div>
+          <dt>{t.hdrSeries}</dt>
+          <dd>{t.siteTitle}</dd>
+        </div>
+        <div>
+          <dt>{t.hdrCategory}</dt>
+          <dd>{t.hdrCategoryValue}</dd>
+        </div>
+        <div>
+          <dt>{t.hdrLesson}</dt>
+          <dd>
+            {pad(lesson.data.order)} {t.of} {pad(lessons.length)}
+          </dd>
+        </div>
+        <div>
+          <dt>{t.hdrEdition}</dt>
+          <dd>{edition}</dd>
+        </div>
+        <div>
+          <dt>{t.hdrLanguage}</dt>
+          <dd>{t.hdrLanguageValue}</dd>
+        </div>
+        <div>
+          <dt>{t.hdrReferences}</dt>
+          <dd>{lesson.data.sources.length}</dd>
+        </div>
+      </dl>
       <h1>{lesson.data.title}</h1>
-      <p class="lede">{lesson.data.summary}</p>
+      <section class="abstract" aria-labelledby="abstract">
+        <h2 class="sh" id="abstract">
+          {t.abstract}
+        </h2>
+        <p class="lede">{lesson.data.summary}</p>
+      </section>
     </header>
     <section class="keys" aria-labelledby="key-points">
-      <h2 id="key-points">{t.keyPoints}</h2>
+      <h2 class="sh" id="key-points">
+        {t.keyPoints}
+      </h2>
       <ol>
         {lesson.data.keyPoints.map((point) => (
           <li>{point}</li>
         ))}
       </ol>
+      {limits && (
+        <p class="limits-aside">
+          <b>{t.limitsTitle}</b>
+          {t.limitsText} <a href={`#${limits.slug}`}>{limits.text}</a>
+        </p>
+      )}
     </section>
     <div class="prose">
       <Content components={{ Widget, Note }} />
     </div>
     <section class="sources" aria-labelledby="sources">
-      <h2 id="sources">{t.sources}</h2>
+      <h2 class="sh" id="sources">
+        {t.sources}
+      </h2>
       <p>{t.sourcesNote}</p>
       <ul>
         {lesson.data.sources.map((source) => (

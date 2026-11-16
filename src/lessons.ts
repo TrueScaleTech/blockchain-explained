@@ -24,7 +24,7 @@ export async function getLessons(locale: Locale): Promise<Lesson[]> {
   return lessons.sort((a, b) => a.data.order - b.data.order);
 }
 
-/** A short rail label: the title up to its colon ("Hashing: a fingerprint…" gives "Hashing"). */
+/** A short contents label: the title up to its colon ("Hashing: a fingerprint…" gives "Hashing"). */
 export function shortTitle(lesson: Lesson): string {
   return lesson.data.title.split(':')[0]!.trim();
 }

@@ -41,10 +41,6 @@ const s = WIDGET_STRINGS[locale].signature;
       <div class="out signature">–</div>
     </div>
     <div class="sig-verify" data-valid="">
-      <svg class="cross" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <line x1="10" y1="10" x2="90" y2="90" pathLength="100"></line>
-        <line x1="90" y1="10" x2="10" y2="90" pathLength="100"></line>
-      </svg>
       <label for="sig-received">{s.received}</label>
       <input id="sig-received" class="received" type="text" maxlength="80" spellcheck="false" />
       <fieldset class="with">
@@ -67,7 +63,7 @@ const s = WIDGET_STRINGS[locale].signature;
 <script>
   import { generateKeyPair, publicKeyHex, sign, verify } from '../../lib/signature';
   import type { WidgetStrings } from '../../widget-strings';
-  import { $, goLive, latest, widgets } from './client';
+  import { $, goLive, latest, resolveText, widgets } from './client';
 
   for (const { root, s } of widgets<WidgetStrings['signature']>('signature')) {
     const publicOut = $(root, '.public');
@@ -98,7 +94,7 @@ const s = WIDGET_STRINGS[locale].signature;
 
     const newKeys = async () => {
       [signer, other] = await Promise.all([generateKeyPair(), generateKeyPair()]);
-      publicOut.textContent = await publicKeyHex(signer.publicKey);
+      resolveText(publicOut, await publicKeyHex(signer.publicKey));
       signature = '';
       signatureOut.textContent = '–';
       await check();
@@ -108,7 +104,7 @@ const s = WIDGET_STRINGS[locale].signature;
     $(root, '.sign').addEventListener('click', async () => {
       if (!signer) return;
       signature = await sign(signer.privateKey, message.value);
-      signatureOut.textContent = signature;
+      resolveText(signatureOut, signature);
       received.value = message.value;
       await check();
     });

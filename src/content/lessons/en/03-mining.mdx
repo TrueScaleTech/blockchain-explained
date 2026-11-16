@@ -33,6 +33,8 @@ Finding the nonce took thousands of hashes; anyone can check it with just one. T
 
 In Bitcoin the target is not a number of zeros but a 256-bit number: the block’s header hash, read as a number, must be lower than the target. Every 2016 blocks the network recalculates the target, so that blocks keep arriving about every ten minutes however much computing power joins or leaves.
 
+## Limits
+
 <Note label="Simplification">
   Here the difficulty counts leading hex zeros and the text hashed is `data|nonce`. Bitcoin compares
   the double SHA-256 of an 80-byte header with a target stored in a compact form. Ethereum stopped

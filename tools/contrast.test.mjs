@@ -36,9 +36,6 @@ export function contrast(a, b) {
 const light = tokens(':root');
 const dark = { ...light, ...tokens(":root[data-theme='dark']") };
 
-// Text colours written directly in the widget styles (labels on the black bench).
-const BENCH_GREYS = ['#c9c9c4', '#b5b5b0', '#a8a8a3', '#8f8f8a'];
-
 test('the contrast formula matches known values', () => {
   assert.equal(Math.round(contrast('#000000', '#ffffff') * 10) / 10, 21);
   assert.equal(contrast('#777777', '#777777'), 1);
@@ -48,13 +45,23 @@ for (const [name, t] of [
   ['light', light],
   ['dark', dark],
 ]) {
-  test(`${name} theme: reading text meets 4.5:1`, () => {
+  test(`${name} theme: text meets 4.5:1 on every surface it is set on`, () => {
     const pairs = [
-      ['ink', 'window'],
-      ['quiet', 'window'],
-      ['signal', 'window'],
+      ['ink', 'ground'],
+      ['ink', 'paper'],
+      ['ink', 'well'],
       ['ink', 'mark-bg'],
-      ['ink', 'field'],
+      ['quiet', 'ground'],
+      ['quiet', 'paper'],
+      ['quiet', 'well'],
+      ['past', 'ground'],
+      ['fail', 'paper'],
+      ['fail', 'well'],
+      ['ok', 'paper'],
+      ['ok', 'well'],
+      ['on-bar', 'bar'],
+      ['bar-quiet', 'bar'],
+      ['on-amber', 'amber'],
     ];
     for (const [fg, bg] of pairs) {
       const ratio = contrast(t[fg], t[bg]);
@@ -62,25 +69,19 @@ for (const [name, t] of [
     }
   });
 
-  test(`${name} theme: the focus ring stands out from the window (3:1)`, () => {
-    assert.ok(contrast(t.focus, t.window) >= 3);
+  test(`${name} theme: borders, rules under links and the focus ring meet 3:1`, () => {
+    const pairs = [
+      ['line', 'paper'],
+      ['line', 'ground'],
+      ['amber-rule', 'ground'],
+      ['amber-rule', 'paper'],
+      ['focus', 'ground'],
+      ['focus', 'paper'],
+      ['amber', 'bar'],
+    ];
+    for (const [fg, bg] of pairs) {
+      const ratio = contrast(t[fg], t[bg]);
+      assert.ok(ratio >= 3, `${name}: ${fg} on ${bg} is ${ratio.toFixed(2)}`);
+    }
   });
 }
-
-test('the frame shared by both themes meets 4.5:1', () => {
-  const pairs = [
-    ['edge', 'black'],
-    ['on-orange', 'orange'],
-    ['orange', 'black'],
-    ['orange', 'charred'],
-    ['black', 'edge'],
-  ];
-  for (const [fg, bg] of pairs) {
-    const ratio = contrast(light[fg], light[bg]);
-    assert.ok(ratio >= 4.5, `${fg} on ${bg} is ${ratio.toFixed(2)}`);
-  }
-  for (const grey of BENCH_GREYS) {
-    assert.ok(contrast(grey, light.black) >= 4.5, `${grey} on black`);
-    assert.ok(contrast(grey, light.charred) >= 4.5, `${grey} on charred`);
-  }
-});

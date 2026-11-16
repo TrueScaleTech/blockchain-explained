@@ -33,6 +33,8 @@ Trovare il nonce ha richiesto migliaia di hash; chiunque può verificarlo con un
 
 In Bitcoin il bersaglio non è un numero di zeri ma un numero di 256 bit: l’hash dell’intestazione del blocco, letto come numero, deve essere più basso del bersaglio. Ogni 2016 blocchi la rete ricalcola il bersaglio, in modo che i blocchi continuino ad arrivare circa ogni dieci minuti, qualunque sia la potenza di calcolo che entra o esce.
 
+## Limiti
+
 <Note label="Semplificazione">
   Qui la difficoltà conta gli zeri esadecimali iniziali e il testo di cui si calcola l’hash è
   `dati|nonce`. Bitcoin confronta il doppio SHA-256 di un’intestazione di 80 byte con un bersaglio

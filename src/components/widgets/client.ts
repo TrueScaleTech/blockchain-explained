@@ -65,3 +65,68 @@ export function latest() {
     isCurrent: (t: number) => t === ticket,
   };
 }
+
+/** True when the reader asked the system for less motion: every effect below is then skipped. */
+export function reducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+const HEX = '0123456789abcdef';
+export function randomHex(length: number): string {
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(bytes, (b) => HEX[b & 15]).join('');
+}
+
+const running = new WeakMap<HTMLElement, number>();
+
+/**
+ * Writes a hash into an element the way a decoder settles: the digits scramble, then lock into
+ * place from left to right. `done` runs once the final text is in (use it to mark changed digits).
+ * With reduced motion the text is written at once. A newer call on the same element cancels the
+ * older one.
+ */
+export function resolveText(el: HTMLElement, text: string, done?: () => void): void {
+  const previous = running.get(el);
+  if (previous !== undefined) cancelAnimationFrame(previous);
+  if (reducedMotion()) {
+    el.textContent = text;
+    done?.();
+    return;
+  }
+  const scramble = 140;
+  const perChar = 5;
+  const start = performance.now();
+  const frame = (now: number) => {
+    const t = now - start;
+    let out = '';
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i]!;
+      out +=
+        !/[0-9a-f]/i.test(ch) || t >= scramble + perChar * i ? ch : HEX[(Math.random() * 16) | 0];
+    }
+    el.textContent = out;
+    if (t < scramble + perChar * text.length) {
+      running.set(el, requestAnimationFrame(frame));
+    } else {
+      running.delete(el);
+      el.textContent = text;
+      done?.();
+    }
+  };
+  running.set(el, requestAnimationFrame(frame));
+}
+
+/** Runs `show` once, the first time the element is on screen (at once without IntersectionObserver). */
+export function whenVisible(el: Element, show: () => void): void {
+  if (!('IntersectionObserver' in window) || reducedMotion()) {
+    show();
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) {
+      observer.disconnect();
+      show();
+    }
+  });
+  observer.observe(el);
+}

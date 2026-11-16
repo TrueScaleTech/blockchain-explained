@@ -25,7 +25,7 @@ L’intestazione del blocco contiene solo la radice, non le transazioni. Siccome
 
 <Widget />
 
-Scegli una transazione: i nodi bianchi sono il suo percorso fino alla radice, quelli arancioni sono la prova, cioè gli hash fratelli che servono per ricostruire la radice. Modifica una transazione e tutto il suo percorso cambia.
+Scegli una transazione: i nodi pieni sono il suo percorso fino alla radice, quelli ambra sono la prova, cioè gli hash fratelli che servono per ricostruire la radice. Modifica una transazione e tutto il suo percorso cambia.
 
 ## Provare una transazione senza le altre
 
@@ -38,6 +38,8 @@ La prova cresce con il numero di livelli, non con il numero di transazioni. Il w
   suoi quattro identificativi di transazione e la confrontano con la radice pubblicata,
   `f3e94742…a25a95766`.
 </Note>
+
+## Limiti
 
 <Note label="Semplificazione">
   Qui le foglie sono il doppio SHA-256 del testo che scrivi, e ogni nodo mostra solo i primi 8

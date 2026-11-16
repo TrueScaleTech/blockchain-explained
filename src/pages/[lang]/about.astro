@@ -1,5 +1,5 @@
 ---
-import Rail from '../../components/Rail.astro';
+import Contents from '../../components/Contents.astro';
 import Base from '../../layouts/Base.astro';
 import { LOCALES, STRINGS, type Locale } from '../../i18n';
 import { getLessons } from '../../lessons';
@@ -14,16 +14,24 @@ const lessons = await getLessons(locale);
 ---
 
 <Base locale={locale} path="about/" current="about" title={t.aboutTitle}>
-  <Rail slot="rail" locale={locale} lessons={lessons} />
-  <div class="window about">
-    <header class="opener">
-      <h1>{t.aboutTitle}</h1>
-    </header>
+  <Contents slot="contents" locale={locale} lessons={lessons} />
+  <article class="about">
+    <dl class="hdr">
+      <div>
+        <dt>{t.hdrSeries}</dt>
+        <dd>{t.siteTitle}</dd>
+      </div>
+      <div>
+        <dt>{t.hdrCategory}</dt>
+        <dd>{t.hdrCategoryValue}</dd>
+      </div>
+    </dl>
+    <h1>{t.aboutTitle}</h1>
     {t.aboutSections.map((section) => (
       <section>
         <h2>{section.heading}</h2>
         <p>{section.body}</p>
       </section>
     ))}
-  </div>
+  </article>
 </Base>

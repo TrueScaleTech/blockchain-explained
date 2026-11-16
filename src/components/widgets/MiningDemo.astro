@@ -126,7 +126,17 @@ const plotBottom = CHART.height - CHART.bottom;
   import { expectedAttempts, mine } from '../../lib/pow';
   import { sha256Hex } from '../../lib/sha256';
   import type { WidgetStrings } from '../../widget-strings';
-  import { $, fill, goLive, numberFormat, widgets, writeMarked } from './client';
+  import {
+    $,
+    fill,
+    goLive,
+    numberFormat,
+    randomHex,
+    reducedMotion,
+    resolveText,
+    widgets,
+    writeMarked,
+  } from './client';
 
   const SVG = 'http://www.w3.org/2000/svg';
 
@@ -166,6 +176,11 @@ const plotBottom = CHART.height - CHART.bottom;
       data.disabled = true;
       result.textContent = '';
       let count = 0;
+      hashOut.classList.add('scan');
+      // While the search runs the digest flickers: a picture of the attempts, not real values.
+      const flicker = reducedMotion()
+        ? null
+        : window.setInterval(() => (hashOut.textContent = randomHex(64)), 60);
       // Real miners do not all start from zero; a random start makes each run a fresh draw,
       // so repeated runs show how much the luck varies around the average.
       const startNonce = globalThis.crypto.getRandomValues(new Uint32Array(1))[0]! % 1_000_000_000;
@@ -175,13 +190,17 @@ const plotBottom = CHART.height - CHART.bottom;
         onProgress: (n) => {
           count = n;
           attempts.textContent = format.format(n);
+          // The nonce is the odometer: it climbs by one per attempt from where the run began.
+          nonceOut.textContent = format.format(startNonce + n);
         },
       });
+      if (flicker !== null) window.clearInterval(flicker);
+      hashOut.classList.remove('scan');
       if (found) {
         attempts.textContent = format.format(found.attempts);
         result.textContent = fill(s.found, { n: format.format(found.attempts) });
         nonceOut.textContent = format.format(found.nonce);
-        writeMarked(hashOut, found.hash, (i) => i < d);
+        resolveText(hashOut, found.hash, () => writeMarked(hashOut, found.hash, (i) => i < d));
         const { cx, cy } = miningPoint(d, found.attempts);
         const dot = document.createElementNS(SVG, 'circle');
         // Spread repeated runs a little sideways so they stay visible.
@@ -191,6 +210,7 @@ const plotBottom = CHART.height - CHART.bottom;
         runs.append(dot);
       } else {
         result.textContent = fill(s.stopped, { n: format.format(count) });
+        hashOut.textContent = '–';
       }
       controller = null;
       button.textContent = s.mine;

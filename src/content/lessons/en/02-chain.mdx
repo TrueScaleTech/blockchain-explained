@@ -28,13 +28,15 @@ Because each block contains the previous block’s hash, the blocks form a chain
 
 <Widget />
 
-Edit the data of block 2: that block and every block after it get the grease cross. Press “Mine” on block 2 and it becomes valid again, but block 3 is still broken, because the previous hash it contains has changed. Repairing history means redoing every block that came after.
+Edit the data of block 2: that block and every block after it turn hatched and are marked Broken. Press “Mine” on block 2 and it becomes valid again, but block 3 is still broken, because the previous hash it contains has changed. Repairing history means redoing every block that came after.
 
 ## Valid means “the work was done”
 
 In this toy chain a block is valid when its hash starts with `000`. The nonce is the number that was changed until that happened: this is proof of work, the subject of the next lesson. Without it, recomputing all the hashes would take a fraction of a second and the chain would protect nothing.
 
 The idea of linking records through their hashes is older than Bitcoin: it comes from research on digital time-stamping by Haber and Stornetta in 1991, which the Bitcoin whitepaper cites.
+
+## Limits
 
 <Note label="Simplification">
   A real Bitcoin header is 80 bytes with six fields (version, previous hash, Merkle root, time,

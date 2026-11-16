@@ -22,11 +22,25 @@ interface Strings {
   toLightTheme: string;
   lessonsHeading: string;
   railLabel: string;
+  contents: string;
+  inLesson: string;
+  abstract: string;
+  figure: string;
+  of: string;
+  hdrSeries: string;
+  hdrLesson: string;
+  hdrCategory: string;
+  hdrCategoryValue: string;
+  hdrLanguage: string;
+  hdrLanguageValue: string;
+  hdrEdition: string;
+  hdrReferences: string;
+  limitsTitle: string;
+  limitsText: string;
+  limitsSlugs: string[];
   continueAt: string;
   start: string;
   open: string;
-  lesson: string;
-  lessonOf: (n: number, total: number) => string;
   keyPoints: string;
   tryIt: string;
   noScript: string;
@@ -56,11 +70,25 @@ export const STRINGS: Record<Locale, Strings> = {
     toLightTheme: 'Switch to the light theme',
     lessonsHeading: 'Lessons',
     railLabel: 'The six lessons, in order',
+    contents: 'Contents',
+    inLesson: 'In this lesson',
+    abstract: 'Abstract',
+    figure: 'Figure',
+    of: 'of',
+    hdrSeries: 'Series',
+    hdrLesson: 'Lesson',
+    hdrCategory: 'Category',
+    hdrCategoryValue: 'Educational',
+    hdrLanguage: 'Language',
+    hdrLanguageValue: 'English',
+    hdrEdition: 'Edition',
+    hdrReferences: 'References',
+    limitsTitle: 'Limits',
+    limitsText: 'Where this toy model differs from the real system:',
+    limitsSlugs: ['limits'],
     continueAt: 'Pick up where you stopped:',
     start: 'Start with lesson 01',
     open: 'Open',
-    lesson: 'Lesson',
-    lessonOf: (n, total) => `Lesson ${n} of ${total}`,
     keyPoints: 'Key points',
     tryIt: 'Try it',
     noScript:
@@ -114,11 +142,25 @@ export const STRINGS: Record<Locale, Strings> = {
     toLightTheme: 'Passa al tema chiaro',
     lessonsHeading: 'Lezioni',
     railLabel: 'Le sei lezioni, in ordine',
+    contents: 'Indice',
+    inLesson: 'In questa lezione',
+    abstract: 'Sommario',
+    figure: 'Figura',
+    of: 'di',
+    hdrSeries: 'Serie',
+    hdrLesson: 'Lezione',
+    hdrCategory: 'Categoria',
+    hdrCategoryValue: 'Didattica',
+    hdrLanguage: 'Lingua',
+    hdrLanguageValue: 'Italiano',
+    hdrEdition: 'Edizione',
+    hdrReferences: 'Riferimenti',
+    limitsTitle: 'Limiti',
+    limitsText: 'Dove questo modello didattico differisce dal sistema reale:',
+    limitsSlugs: ['limiti'],
     continueAt: 'Riprendi dall’ultima lezione aperta:',
     start: 'Comincia dalla lezione 01',
     open: 'Apri',
-    lesson: 'Lezione',
-    lessonOf: (n, total) => `Lezione ${n} di ${total}`,
     keyPoints: 'Punti chiave',
     tryIt: 'Prova',
     noScript:

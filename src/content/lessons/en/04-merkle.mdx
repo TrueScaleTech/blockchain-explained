@@ -25,7 +25,7 @@ The block header contains only the root, not the transactions. Because every has
 
 <Widget />
 
-Pick a transaction: the white nodes are its path to the root, and the orange ones are the proof, the sibling hashes needed to rebuild the root. Edit a transaction and its whole path changes.
+Pick a transaction: the filled nodes are its path to the root, and the amber ones are the proof, the sibling hashes needed to rebuild the root. Edit a transaction and its whole path changes.
 
 ## Proving one transaction without the others
 
@@ -37,6 +37,8 @@ The proof grows with the number of levels, not with the number of transactions. 
   The tests of this site rebuild the Merkle root of Bitcoin block 100,000 from its four transaction
   ids and compare it with the published root, `f3e94742…a25a95766`.
 </Note>
+
+## Limits
 
 <Note label="Simplification">
   The leaves here are the double SHA-256 of the text you type, and each node shows only its first 8

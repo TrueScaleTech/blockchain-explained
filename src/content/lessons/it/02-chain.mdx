@@ -28,13 +28,15 @@ Poiché ogni blocco contiene l’hash del precedente, i blocchi formano una cate
 
 <Widget />
 
-Modifica i dati del blocco 2: quel blocco e tutti quelli successivi ricevono la croce. Premi “Mina” sul blocco 2 e torna valido, ma il blocco 3 resta rotto, perché l’hash precedente che contiene è cambiato. Riparare la storia significa rifare tutti i blocchi venuti dopo.
+Modifica i dati del blocco 2: quel blocco e tutti quelli successivi vengono tratteggiati e segnati come rotti. Premi “Mina” sul blocco 2 e torna valido, ma il blocco 3 resta rotto, perché l’hash precedente che contiene è cambiato. Riparare la storia significa rifare tutti i blocchi venuti dopo.
 
 ## Valido vuol dire “il lavoro è stato fatto”
 
 In questa catena di prova un blocco è valido quando il suo hash inizia con `000`. Il nonce è il numero che è stato cambiato finché non è successo: è la proof of work, l’argomento della prossima lezione. Senza di essa ricalcolare tutti gli hash richiederebbe una frazione di secondo e la catena non proteggerebbe nulla.
 
 L’idea di collegare le registrazioni attraverso i loro hash è più vecchia di Bitcoin: viene dalle ricerche sulla marcatura temporale digitale di Haber e Stornetta del 1991, citate nel whitepaper di Bitcoin.
+
+## Limiti
 
 <Note label="Semplificazione">
   Una vera intestazione Bitcoin è lunga 80 byte e ha sei campi (versione, hash precedente, radice di

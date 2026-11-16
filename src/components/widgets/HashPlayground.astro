@@ -55,7 +55,7 @@ const initial = await sha256Hex(s.start);
 <script>
   import { differingBits, sha256Hex } from '../../lib/sha256';
   import type { WidgetStrings } from '../../widget-strings';
-  import { $, goLive, latest, widgets, writeMarked } from './client';
+  import { $, goLive, latest, resolveText, widgets, writeMarked } from './client';
 
   for (const { root } of widgets<WidgetStrings['hash']>('hash')) {
     const input = $<HTMLInputElement>(root, '.hash-input');
@@ -68,8 +68,11 @@ const initial = await sha256Hex(s.start);
     let refHash = refOut.textContent?.trim() ?? '';
     let nowHash = refHash;
 
-    const render = () => {
-      writeMarked(nowOut, nowHash, (i) => nowHash[i] !== refHash[i]);
+    const render = (animate = false) => {
+      const shown = nowHash;
+      const mark = () => writeMarked(nowOut, shown, (i) => shown[i] !== refHash[i]);
+      if (animate) resolveText(nowOut, shown, mark);
+      else mark();
       let changed = 0;
       for (let i = 0; i < nowHash.length; i++) if (nowHash[i] !== refHash[i]) changed++;
       bits.textContent = `${differingBits(nowHash, refHash)} / 256`;
@@ -81,7 +84,7 @@ const initial = await sha256Hex(s.start);
       const hash = await sha256Hex(input.value);
       if (!turn.isCurrent(t)) return;
       nowHash = hash;
-      render();
+      render(true);
     });
 
     $(root, '.pin').addEventListener('click', () => {
