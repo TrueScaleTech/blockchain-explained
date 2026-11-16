@@ -1,0 +1,42 @@
+---
+order: 6
+title: 'Consensus and the 51% attack'
+summary: 'Nodes follow the chain with the most accumulated work. An attacker with less than half of the computing power falls behind, and every confirmation makes catching up less likely.'
+keyPoints:
+  - 'When two versions of the chain compete, nodes follow the valid one with the most proof of work.'
+  - 'To undo a payment, an attacker must secretly build a longer chain starting from before that payment.'
+  - 'With less than half of the power, the chance of catching up falls exponentially with each confirmation.'
+  - 'With half or more, the attacker eventually wins: hence the name “51% attack”. Even then, they cannot forge signatures or spend other people’s coins.'
+widget: attack
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), sections 5 and 11'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Guide: block chain and forks'
+    url: 'https://developer.bitcoin.org/devguide/block_chain.html'
+  - title: 'ethereum.org: Proof-of-stake (PoS)'
+    url: 'https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/'
+---
+
+## Which chain is the real one?
+
+Thousands of nodes and no central server: they need a rule to agree on a single history. In Bitcoin the rule is simple: follow the valid chain with the most accumulated proof of work, which is usually the longest. If two miners find a block at almost the same moment, the network splits for a while; the next block extends one of the two branches, and everyone switches to it.
+
+## The attacker’s race
+
+Suppose Mallory pays a merchant, receives the goods, and then wants the payment to disappear. She must build, in secret, a different chain without that payment, starting from a block before it, and make it longer than the honest chain. Meanwhile the honest network keeps adding blocks. Every block added on top of the payment is a confirmation, and the merchant decides how many to wait for.
+
+Section 11 of the Bitcoin whitepaper computes Mallory’s chance as a race between two random processes. The widget uses the same formula, and the site’s tests check it against the tables printed in the whitepaper.
+
+<Widget />
+
+With 10% of the computing power and 6 confirmations, the attacker succeeds about once in 4,000 tries (0.024%). With 30%, the same 6 confirmations still leave about 13%, and the merchant would have to wait for 24 to fall below 0.1%. At 50% or more, no number of confirmations is enough.
+
+## What a majority cannot do
+
+A majority of the computing power lets an attacker undo or reorder recent transactions, including their own payments, and refuse to include other people’s transactions. It does not let them create coins out of nothing or spend coins locked to someone else’s key: every node still checks the signatures and the rules, and a block that breaks them is rejected however much work it carries.
+
+<Note label="Beyond proof of work">
+  Ethereum moved to proof of stake in September 2022. Validators lock up coins as a deposit and take
+  turns proposing blocks; a validator who cheats loses part of the deposit. Agreement comes from
+  votes weighted by the deposits, not from accumulated work.
+</Note>

@@ -1,0 +1,38 @@
+---
+// The bench: the black panel a widget is worked on. The server renders the widget's starting
+// state, so without JavaScript the reader still sees a correct static figure; controls that need
+// a script carry the class "live" and stay hidden until the widget script shows them.
+import { STRINGS, type Locale } from '../../i18n';
+
+interface Props {
+  name: string;
+  locale: Locale;
+  title: string;
+  hint: string;
+  strings: unknown;
+}
+
+const { name, locale, title, hint, strings } = Astro.props;
+const t = STRINGS[locale];
+const id = `bench-${name}`;
+---
+
+<section
+  class="bench"
+  data-widget={name}
+  data-strings={JSON.stringify(strings)}
+  aria-labelledby={id}
+>
+  <div class="bench-head">
+    <h3 class="title" id={id}>
+      {t.tryIt} · {title}
+    </h3>
+    <p class="hint live" hidden>
+      {hint}
+    </p>
+  </div>
+  <div class="bench-body">
+    <slot />
+    <p class="noscript muted">{t.noScript}</p>
+  </div>
+</section>

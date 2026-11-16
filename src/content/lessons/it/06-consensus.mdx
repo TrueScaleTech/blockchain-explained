@@ -1,0 +1,42 @@
+---
+order: 6
+title: 'Consenso e attacco del 51%'
+summary: 'I nodi seguono la catena con più lavoro accumulato. Chi attacca con meno di metà della potenza di calcolo resta indietro, e ogni conferma rende più improbabile che recuperi.'
+keyPoints:
+  - 'Quando due versioni della catena sono in competizione, i nodi seguono quella valida con più proof of work.'
+  - 'Per annullare un pagamento, chi attacca deve costruire in segreto una catena più lunga che parta da prima di quel pagamento.'
+  - 'Con meno di metà della potenza, la probabilità di recuperare scende in modo esponenziale a ogni conferma.'
+  - 'Con metà o più, prima o poi l’attaccante vince: da qui il nome “attacco del 51%”. Anche così non può falsificare firme né spendere le monete degli altri.'
+widget: attack
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), sezioni 5 e 11'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Guide: block chain and forks'
+    url: 'https://developer.bitcoin.org/devguide/block_chain.html'
+  - title: 'ethereum.org: Proof-of-stake (PoS)'
+    url: 'https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/'
+---
+
+## Qual è la catena vera?
+
+Migliaia di nodi e nessun server centrale: serve una regola per mettersi d’accordo su una sola storia. In Bitcoin la regola è semplice: seguire la catena valida con più proof of work accumulata, che di solito è la più lunga. Se due blocchi vengono trovati quasi nello stesso momento, la rete si divide per un po’; il blocco successivo allunga uno dei due rami, e tutti passano a quello.
+
+## La corsa di chi attacca
+
+Supponiamo che Mallory paghi un negozio, riceva la merce e poi voglia far sparire il pagamento. Deve costruire in segreto una catena diversa, senza quel pagamento, a partire da un blocco precedente, e renderla più lunga di quella onesta. Intanto la rete onesta continua ad aggiungere blocchi. Ogni blocco aggiunto sopra il pagamento è una conferma, e il negozio decide quante attenderne.
+
+La sezione 11 del whitepaper di Bitcoin calcola la probabilità di Mallory come una gara tra due processi casuali. Il widget usa la stessa formula, e i test del sito la confrontano con le tabelle stampate nel whitepaper.
+
+<Widget />
+
+Con il 10% della potenza di calcolo e 6 conferme, l’attacco riesce circa una volta su 4.000 (0,024%). Con il 30%, le stesse 6 conferme lasciano ancora circa il 13%, e il negozio dovrebbe attenderne 24 per scendere sotto lo 0,1%. Dal 50% in su, nessun numero di conferme basta.
+
+## Che cosa non può fare una maggioranza
+
+La maggioranza della potenza di calcolo permette di annullare o riordinare le transazioni recenti, compresi i propri pagamenti, e di escludere le transazioni degli altri. Non permette di creare monete dal nulla né di spendere monete vincolate alla chiave di un altro: ogni nodo continua a controllare le firme e le regole, e un blocco che le viola viene rifiutato per quanto lavoro contenga.
+
+<Note label="Oltre la proof of work">
+  Ethereum è passato alla proof of stake nel settembre 2022. I validatori bloccano delle monete come
+  deposito e propongono i blocchi a turno; chi bara perde una parte del deposito. L’accordo nasce da
+  voti pesati sui depositi, non dal lavoro accumulato.
+</Note>

@@ -1,0 +1,12 @@
+---
+// A note the lesson owes the reader, such as a simplification: a tape band across its top.
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<aside class="note">
+  <span class="label">{label}</span>
+  <slot />
+</aside>

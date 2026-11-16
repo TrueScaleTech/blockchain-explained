@@ -1,0 +1,124 @@
+---
+import { isLocale } from '../../i18n';
+import { WIDGET_STRINGS } from '../../widget-strings';
+import Bench from './Bench.astro';
+
+const locale = isLocale(Astro.params.lang) ? Astro.params.lang : 'en';
+const s = WIDGET_STRINGS[locale].signature;
+// Keys can only be made in the reader's browser, so this widget has no build-time figure:
+// without JavaScript only the lesson text explains it.
+---
+
+<Bench name="signature" locale={locale} title={s.title} hint={s.hint} strings={s}>
+  <div class="sig live" hidden>
+    <div class="sig-keys">
+      <div>
+        <span class="lab">{s.publicKey}</span>
+        <div class="out public">–</div>
+      </div>
+      <div>
+        <span class="lab">{s.privateKey}</span>
+        <p class="muted private-note">{s.privateNote}</p>
+      </div>
+      <button class="btn ghost new-keys" type="button">
+        {s.keys}
+      </button>
+    </div>
+    <div class="sig-sign">
+      <label for="sig-message">{s.message}</label>
+      <input
+        id="sig-message"
+        class="message"
+        type="text"
+        value={s.start}
+        maxlength="80"
+        spellcheck="false"
+      />
+      <button class="btn sign" type="button">
+        {s.sign}
+      </button>
+      <span class="lab">{s.signature}</span>
+      <div class="out signature">–</div>
+    </div>
+    <div class="sig-verify" data-valid="">
+      <svg class="cross" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="10" y1="10" x2="90" y2="90" pathLength="100"></line>
+        <line x1="90" y1="10" x2="10" y2="90" pathLength="100"></line>
+      </svg>
+      <label for="sig-received">{s.received}</label>
+      <input id="sig-received" class="received" type="text" maxlength="80" spellcheck="false" />
+      <fieldset class="with">
+        <legend class="lab">{s.verifyWith}</legend>
+        <label class="radio">
+          <input type="radio" name="sig-key" value="signer" checked />
+          {s.signerKey}
+        </label>
+        <label class="radio">
+          <input type="radio" name="sig-key" value="other" /> {s.otherKey}
+        </label>
+      </fieldset>
+    </div>
+  </div>
+  <p class="readout live" hidden aria-live="polite">
+    <span class="verdict">{s.waiting}</span>
+  </p>
+</Bench>
+
+<script>
+  import { generateKeyPair, publicKeyHex, sign, verify } from '../../lib/signature';
+  import type { WidgetStrings } from '../../widget-strings';
+  import { $, goLive, latest, widgets } from './client';
+
+  for (const { root, s } of widgets<WidgetStrings['signature']>('signature')) {
+    const publicOut = $(root, '.public');
+    const message = $<HTMLInputElement>(root, '.message');
+    const signatureOut = $(root, '.signature');
+    const received = $<HTMLInputElement>(root, '.received');
+    const verifyBox = $(root, '.sig-verify');
+    const verdict = $(root, '.verdict');
+    const turn = latest();
+    let signer: CryptoKeyPair | null = null;
+    let other: CryptoKeyPair | null = null;
+    let signature = '';
+
+    const check = async () => {
+      const t = turn.next();
+      if (!signer || !other || !signature) {
+        verifyBox.dataset.valid = '';
+        verdict.textContent = s.waiting;
+        return;
+      }
+      const which = root.querySelector<HTMLInputElement>('input[name="sig-key"]:checked')?.value;
+      const key = which === 'other' ? other.publicKey : signer.publicKey;
+      const ok = await verify(key, received.value, signature);
+      if (!turn.isCurrent(t)) return;
+      verifyBox.dataset.valid = String(ok);
+      verdict.textContent = ok ? s.valid : s.invalid;
+    };
+
+    const newKeys = async () => {
+      [signer, other] = await Promise.all([generateKeyPair(), generateKeyPair()]);
+      publicOut.textContent = await publicKeyHex(signer.publicKey);
+      signature = '';
+      signatureOut.textContent = '–';
+      await check();
+    };
+
+    $(root, '.new-keys').addEventListener('click', () => void newKeys());
+    $(root, '.sign').addEventListener('click', async () => {
+      if (!signer) return;
+      signature = await sign(signer.privateKey, message.value);
+      signatureOut.textContent = signature;
+      received.value = message.value;
+      await check();
+    });
+    received.addEventListener('input', () => void check());
+    root
+      .querySelectorAll('input[name="sig-key"]')
+      .forEach((radio) => radio.addEventListener('change', () => void check()));
+
+    received.value = message.value;
+    goLive(root);
+    void newKeys();
+  }
+</script>

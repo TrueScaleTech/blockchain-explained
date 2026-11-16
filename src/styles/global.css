@@ -314,7 +314,9 @@ a {
 .frame[data-stopped]:not([aria-current]) .flag {
   color: var(--black);
 }
+/* On the white current frame the flag is orange tape, or it would vanish into the frame. */
 .frame[aria-current='page'] .flag {
+  color: var(--orange);
   animation: fold 0.7s var(--ease-out) 0.15s both;
 }
 @keyframes fold {
@@ -673,12 +675,15 @@ main {
   accent-color: var(--orange);
 }
 
-/* Grease cross: the mark for a block whose work no longer holds. */
+/* Grease cross: the mark for a block (or a signature) whose proof no longer holds.
+   Each line has pathLength 100, so the draw-on works whatever the box's size. */
 .cross line {
   stroke: var(--edge);
-  stroke-width: 7;
+  stroke-width: 5;
+  stroke-opacity: 0.9;
   stroke-linecap: round;
-  stroke-dasharray: 140;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 100;
   stroke-dashoffset: 0;
   animation: strike 0.45s var(--ease-out) both;
 }
@@ -687,8 +692,463 @@ main {
 }
 @keyframes strike {
   from {
-    stroke-dashoffset: 140;
+    stroke-dashoffset: 100;
   }
+}
+
+/* ---------- Widgets ---------- */
+
+.bench {
+  container-type: inline-size;
+}
+.bench .out {
+  padding: 10px 12px;
+  background: var(--charred);
+  border: 1px solid var(--spool);
+}
+.bench .rule {
+  margin: 0;
+  font: 600 0.95rem/1.3 var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #c9c9c4;
+}
+.bench .readout .muted {
+  font: 500 0.95rem/1.3 var(--read);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Hash */
+.hash-rows {
+  display: grid;
+  gap: 14px;
+}
+.hash-rows q {
+  text-transform: none;
+  letter-spacing: 0;
+  font: 500 0.95rem var(--mono);
+  color: var(--edge);
+}
+
+/* Chain: blocks are frames on a strip; a broken one carries a grease cross. */
+.chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+@container (min-width: 30rem) {
+  .chain {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 52rem) {
+  .chain {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 14px 14px;
+  background: var(--charred);
+  border: 1px solid var(--spool);
+  border-top: 8px solid var(--orange);
+}
+.block[data-valid='false'] {
+  border-top-color: var(--spool);
+}
+/* The cross is struck over the whole frame, controls included; clicks pass through it. */
+.block .cross {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: none;
+}
+.block[data-valid='false'] .cross {
+  display: block;
+}
+.block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.block-head .lab {
+  margin: 0;
+  color: var(--edge);
+  font-size: 1.1rem;
+}
+.block .status {
+  font: 600 0.9rem/1 var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 8px;
+  background: var(--orange);
+  color: var(--black);
+}
+.block[data-valid='false'] .status {
+  background: var(--edge);
+}
+.block .lab {
+  margin: 0;
+}
+.block .data-static {
+  margin: 0;
+  font: 500 0.95rem/1.4 var(--mono);
+}
+.block textarea {
+  font-size: 0.95rem;
+}
+.block dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 10px;
+  align-items: baseline;
+}
+.block dt {
+  font: 600 0.85rem/1.2 var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c9c9c4;
+}
+.block dd {
+  margin: 0;
+  font: 500 0.88rem/1.3 var(--mono);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.block .mine {
+  margin-top: auto;
+  min-height: 40px;
+}
+
+/* Mining */
+.mine-controls {
+  display: grid;
+  gap: 16px;
+}
+@container (min-width: 40rem) {
+  .mine-controls {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    align-items: end;
+  }
+}
+.mine-last {
+  display: grid;
+  gap: 6px;
+}
+.mine-last[hidden] {
+  display: none;
+}
+
+/* Charts: hand-drawn SVG, coloured from the tokens. */
+.chart {
+  margin: 0;
+  overflow-x: auto;
+}
+.chart svg {
+  display: block;
+  width: 100%;
+  max-width: 44rem;
+  min-width: 420px;
+  height: auto;
+}
+.chart text {
+  font: 500 13px var(--mono);
+  fill: #c9c9c4;
+}
+.chart .axis-label {
+  font: 600 14px var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.chart .grid line {
+  stroke: var(--spool);
+  stroke-width: 1;
+}
+.chart .grid .axis {
+  stroke: var(--edge);
+}
+.expected-line {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+.expected-dot {
+  fill: var(--black);
+  stroke: var(--edge);
+  stroke-width: 2;
+}
+.runs circle {
+  fill: var(--orange);
+  stroke: var(--black);
+  stroke-width: 1.5;
+}
+.reference-line {
+  fill: none;
+  stroke: #8f8f8a;
+  stroke-width: 1.5;
+}
+.current-line {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+}
+.current-point {
+  fill: var(--orange);
+  stroke: var(--edge);
+  stroke-width: 2;
+}
+.chart .curve-label {
+  fill: #c9c9c4;
+}
+.chart figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin-top: 10px;
+  font: 600 0.9rem/1.3 var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #c9c9c4;
+}
+.key::before {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  margin-right: 8px;
+  vertical-align: middle;
+  border-top: 2px dashed var(--edge);
+}
+.key-runs::before {
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--orange);
+}
+.key[hidden] {
+  display: none;
+}
+
+/* Merkle */
+.leaf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px 14px;
+}
+@container (min-width: 40rem) {
+  .leaf-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.leaf-actions,
+.pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.leaf-editor[hidden],
+.pick[hidden] {
+  display: none;
+}
+.chip {
+  min-width: 48px;
+  min-height: 40px;
+  padding: 6px 12px;
+  font: 600 1rem/1 var(--display);
+  letter-spacing: 0.06em;
+  color: var(--edge);
+  background: transparent;
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.chip:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.chip[aria-pressed='true'] {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--black);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.tree {
+  margin: 0;
+  overflow-x: auto;
+}
+.tree svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  min-width: 520px;
+  margin: 0 auto;
+}
+.tree .edge {
+  stroke: var(--spool);
+  stroke-width: 2;
+}
+.tree .edge.on-path {
+  stroke: var(--edge);
+  stroke-width: 3;
+}
+.tree .edge.ghost {
+  stroke-dasharray: 4 4;
+}
+.tree .node rect {
+  fill: var(--charred);
+  stroke: #55554f;
+  stroke-width: 1;
+}
+.tree .node text {
+  font: 500 13px var(--mono);
+  fill: var(--edge);
+}
+.tree .node.on-path rect {
+  fill: var(--edge);
+  stroke: var(--edge);
+}
+.tree .node.on-path text {
+  fill: var(--black);
+}
+.tree .node.sibling rect {
+  fill: var(--orange);
+  stroke: var(--orange);
+}
+.tree .node.sibling text {
+  fill: var(--black);
+}
+.tree .node.ghost rect {
+  fill: transparent;
+  stroke-dasharray: 4 3;
+}
+.tree .node.ghost:not(.sibling) text {
+  fill: #a8a8a3;
+  font-family: var(--display);
+  text-transform: uppercase;
+}
+.tree .leaf-label {
+  font: 600 14px var(--display);
+  fill: #c9c9c4;
+  letter-spacing: 0.06em;
+}
+.root-line {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+}
+.root-line .lab {
+  margin: 0;
+}
+
+/* Signatures */
+.sig {
+  display: grid;
+  gap: 22px;
+}
+.sig[hidden] {
+  display: none;
+}
+.sig-keys,
+.sig-sign {
+  display: grid;
+  gap: 10px;
+}
+.sig-keys .btn,
+.sig-sign .btn {
+  justify-self: start;
+}
+.private-note {
+  margin: 0;
+}
+.sig-verify {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: var(--charred);
+  border: 1px solid var(--spool);
+  border-top: 8px solid var(--spool);
+}
+.sig-verify[data-valid='true'] {
+  border-top-color: var(--orange);
+}
+/* In a wide box a full-size cross would flatten into scratches: here it is a square mark. */
+.sig-verify .cross {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+  display: none;
+}
+.sig-verify[data-valid='false'] .cross {
+  display: block;
+}
+.sig-verify > label:first-of-type {
+  padding-right: 60px;
+}
+.with {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+}
+.with legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 1rem var(--read);
+  cursor: pointer;
+}
+.radio input {
+  accent-color: var(--orange);
+  width: 18px;
+  height: 18px;
+}
+
+/* Attack */
+.attack-controls {
+  display: grid;
+  gap: 16px;
+}
+@container (min-width: 40rem) {
+  .attack-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.attack-controls b {
+  color: var(--orange);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Sources and pager ---------- */

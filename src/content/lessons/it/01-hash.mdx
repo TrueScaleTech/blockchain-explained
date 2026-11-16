@@ -1,0 +1,46 @@
+---
+order: 1
+title: 'Hash: un’impronta per qualsiasi dato'
+summary: 'Una funzione di hash trasforma qualsiasi dato in un’impronta breve e di lunghezza fissa. Basta cambiare un carattere e l’impronta cambia del tutto: è così che una blockchain si accorge di una manomissione.'
+keyPoints:
+  - 'Lo stesso input dà sempre lo stesso hash, e SHA-256 dà sempre 256 bit (64 caratteri esadecimali), qualunque sia la dimensione dell’input.'
+  - 'Cambiando un solo carattere cambia circa metà dei bit, senza alcuno schema visibile.'
+  - 'Tornare indietro non è praticabile: da un hash non si ricava l’input, né si trova un altro input con lo stesso hash.'
+widget: hash
+sources:
+  - title: 'NIST FIPS 180-4, Secure Hash Standard (SHS)'
+    url: 'https://csrc.nist.gov/pubs/fips/180-4/upd1/final'
+  - title: 'NIST, Cryptographic Standards and Guidelines: example values'
+    url: 'https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values'
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008)'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+---
+
+## Che cosa fa una funzione di hash
+
+Una funzione di hash legge dati di qualsiasi lunghezza (una parola, un contratto, un film intero) e restituisce una stringa di lunghezza fissa, chiamata digest o semplicemente hash. SHA-256, la funzione su cui si basa Bitcoin, restituisce 256 bit, di solito scritti come 64 caratteri esadecimali. È deterministica: lo stesso input dà lo stesso output su qualsiasi computer, ogni volta.
+
+<Widget />
+
+## Tre proprietà che contano
+
+**Effetto valanga.** Una minima modifica dell’input produce un hash completamente diverso. Nel widget, cambiare una lettera inverte circa metà dei 256 bit, e il nuovo hash non conserva traccia del vecchio.
+
+**Senso unico.** Dato un hash, non si conosce alcuna scorciatoia per trovare un input che lo produca. L’unico metodo è provare un input dopo l’altro, e con 256 bit è un lavoro fuori dalla portata di qualsiasi computer.
+
+**Resistenza alle collisioni.** Due input diversi con lo stesso hash devono esistere, perché gli input possibili sono infiniti e gli hash solo 2²⁵⁶. Ma nessuno sa come trovarne una coppia per SHA-256.
+
+## Perché serve a una blockchain
+
+Un hash funziona come un’impronta digitale. Si conserva l’hash di un documento e più tardi si può capire se il documento è cambiato calcolandolo di nuovo e confrontando. Una blockchain usa questa idea ovunque: ogni blocco contiene l’hash del blocco precedente (lezione 2), il mining cerca hash con una forma particolare (lezione 3) e un albero di Merkle riassume migliaia di transazioni in un solo hash (lezione 4).
+
+<Note label="Verifica da te">
+  L’hash delle tre lettere `abc` è
+  `ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`, il valore pubblicato dal NIST.
+  Scrivi `abc` nel widget e confronta.
+</Note>
+
+<Note label="Nei sistemi reali">
+  Bitcoin calcola l’hash delle intestazioni dei blocchi e delle transazioni due volte con SHA-256
+  (“doppio SHA-256”). Ethereum usa una funzione diversa, Keccak-256. Il principio è lo stesso.
+</Note>

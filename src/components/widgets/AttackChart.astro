@@ -1,0 +1,162 @@
+---
+import { isLocale } from '../../i18n';
+import {
+  CHART,
+  attackPath,
+  attackPoint,
+  attackXTicks,
+  attackYTicks,
+  percent,
+} from '../../lib/charts';
+import { attackerSuccessProbability, confirmationsNeeded } from '../../lib/nakamoto';
+import { WIDGET_STRINGS, fill } from '../../widget-strings';
+import Bench from './Bench.astro';
+
+const START_Q = 0.1;
+const START_Z = 6;
+const REFERENCE_Q = [0.1, 0.3];
+const locale = isLocale(Astro.params.lang) ? Astro.params.lang : 'en';
+const s = WIDGET_STRINGS[locale].attack;
+const nf = new Intl.NumberFormat(locale, { maximumSignificantDigits: 4 });
+const pct = (p: number) => `${nf.format(percent(p))}%`;
+const yLabel = (v: number) =>
+  `${new Intl.NumberFormat(locale, { maximumFractionDigits: 6 }).format(v * 100)}%`;
+const p = attackerSuccessProbability(START_Q, START_Z);
+const point = attackPoint(START_Q, START_Z);
+const needed = confirmationsNeeded(START_Q, 0.001);
+const plotLeft = CHART.left;
+const plotRight = CHART.width - CHART.right;
+const plotTop = CHART.top;
+const plotBottom = CHART.height - CHART.bottom;
+const qLabel = (q: number) => `q = ${new Intl.NumberFormat(locale).format(q)}`;
+---
+
+<Bench name="attack" locale={locale} title={s.title} hint={s.hint} strings={s}>
+  <div class="attack-controls live" hidden>
+    <div>
+      <label for="attack-q">
+        {s.share}: <b class="q-value">{Math.round(START_Q * 100)}%</b>
+      </label>
+      <input id="attack-q" class="q" type="range" min="1" max="49" step="1" value={START_Q * 100} />
+    </div>
+    <div>
+      <label for="attack-z">
+        {s.confirmations}: <b class="z-value">{START_Z}</b>
+      </label>
+      <input id="attack-z" class="z" type="range" min="0" max="20" step="1" value={START_Z} />
+    </div>
+  </div>
+  <p class="readout" aria-live="polite">
+    <span>
+      {s.probability}
+      <b class="p">{pct(p)}</b>{' '}
+      <span class="one-in muted">
+        {fill(s.oneIn, { n: new Intl.NumberFormat(locale).format(Math.round(1 / p)) })}
+      </span>
+    </span>
+    <span>
+      {s.needed}
+      <b class="needed">{needed ?? s.never}</b>
+    </span>
+  </p>
+  <figure class="chart">
+    <svg viewBox={`0 0 ${CHART.width} ${CHART.height}`} role="img" aria-label={s.chart}>
+      <g class="grid">
+        {attackYTicks().map((tick) => (
+          <>
+            <line x1={plotLeft} x2={plotRight} y1={tick.at} y2={tick.at} />
+            <text x={plotLeft - 8} y={tick.at + 4} text-anchor="end">
+              {yLabel(tick.value)}
+            </text>
+          </>
+        ))}
+        {attackXTicks().map((tick) => (
+          <text x={tick.at} y={plotBottom + 20} text-anchor="middle">
+            {tick.value}
+          </text>
+        ))}
+        <line class="axis" x1={plotLeft} x2={plotRight} y1={plotBottom} y2={plotBottom}></line>
+        <text
+          class="axis-label"
+          x={(plotLeft + plotRight) / 2}
+          y={CHART.height - 4}
+          text-anchor="middle"
+        >
+          {s.axisX}
+        </text>
+        <text class="axis-label" x={plotLeft} y={plotTop - 4}>
+          {s.axisY}
+        </text>
+      </g>
+      {REFERENCE_Q.map((q) => (
+        <>
+          <path class="reference-line" d={attackPath(q)} />
+          <text
+            class="curve-label"
+            x={plotRight - 4}
+            y={q === 0.1 ? plotBottom - 8 : plotTop + 40}
+            text-anchor="end"
+          >
+            {qLabel(q)}
+          </text>
+        </>
+      ))}
+      <path class="current-line" d={attackPath(START_Q)}></path>
+      {point && <circle class="current-point" cx={point.cx} cy={point.cy} r="6" />}
+    </svg>
+  </figure>
+</Bench>
+
+<script>
+  import { attackPath, attackPoint, percent } from '../../lib/charts';
+  import { attackerSuccessProbability, confirmationsNeeded } from '../../lib/nakamoto';
+  import type { WidgetStrings } from '../../widget-strings';
+  import { $, fill, goLive, numberFormat, widgets } from './client';
+
+  for (const { root, s } of widgets<WidgetStrings['attack']>('attack')) {
+    const qInput = $<HTMLInputElement>(root, '.q');
+    const zInput = $<HTMLInputElement>(root, '.z');
+    const qValue = $(root, '.q-value');
+    const zValue = $(root, '.z-value');
+    const pOut = $(root, '.p');
+    const oneIn = $(root, '.one-in');
+    const neededOut = $(root, '.needed');
+    const line = $<SVGPathElement>(root, '.current-line');
+    const svg = $<SVGSVGElement>(root, '.chart svg');
+    const sig = numberFormat({ maximumSignificantDigits: 4 });
+    const whole = numberFormat();
+
+    const update = () => {
+      const q = Number(qInput.value) / 100;
+      const z = Number(zInput.value);
+      const p = attackerSuccessProbability(q, z);
+      qValue.textContent = `${Math.round(q * 100)}%`;
+      zValue.textContent = String(z);
+      pOut.textContent = `${sig.format(percent(p))}%`;
+      oneIn.textContent =
+        p > 0 && p < 1 ? fill(s.oneIn, { n: whole.format(Math.round(1 / p)) }) : '';
+      const needed = confirmationsNeeded(q, 0.001);
+      neededOut.textContent = needed === null ? s.never : String(needed);
+      line.setAttribute('d', attackPath(q));
+      let dot = svg.querySelector<SVGCircleElement>('.current-point');
+      const point = attackPoint(q, z);
+      if (point) {
+        if (!dot) {
+          dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.classList.add('current-point');
+          dot.setAttribute('r', '6');
+          svg.append(dot);
+        }
+        dot.setAttribute('cx', String(point.cx));
+        dot.setAttribute('cy', String(point.cy));
+      } else {
+        dot?.remove();
+      }
+    };
+
+    qInput.addEventListener('input', update);
+    zInput.addEventListener('input', update);
+    goLive(root);
+    update();
+  }
+</script>

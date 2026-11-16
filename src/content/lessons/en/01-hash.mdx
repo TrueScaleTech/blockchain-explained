@@ -1,0 +1,46 @@
+---
+order: 1
+title: 'Hashing: a fingerprint for any data'
+summary: 'A hash function turns any data into a short, fixed-size fingerprint. Change one character and the fingerprint changes completely: that is how a blockchain notices tampering.'
+keyPoints:
+  - 'The same input always gives the same hash, and SHA-256 always gives 256 bits (64 hex characters), whatever the size of the input.'
+  - 'Change a single character and about half of the bits change, with no visible pattern.'
+  - 'Going backwards is impractical: from a hash you cannot recover the input, nor find another input with the same hash.'
+widget: hash
+sources:
+  - title: 'NIST FIPS 180-4, Secure Hash Standard (SHS)'
+    url: 'https://csrc.nist.gov/pubs/fips/180-4/upd1/final'
+  - title: 'NIST, Cryptographic Standards and Guidelines: example values'
+    url: 'https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values'
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008)'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+---
+
+## What a hash function does
+
+A hash function reads data of any length (a word, a contract, a whole film) and returns a string of fixed length called the digest, or simply the hash. SHA-256, the function Bitcoin is built on, returns 256 bits, usually written as 64 hexadecimal characters. It is deterministic: the same input gives the same output on any computer, every time.
+
+<Widget />
+
+## Three properties that matter
+
+**Avalanche.** A tiny change in the input produces a completely different hash. In the widget, changing one letter flips about half of the 256 bits, and the new hash keeps no trace of the old one.
+
+**One-way.** Given a hash, there is no known shortcut for finding an input that produces it. The only method is to try inputs one by one, and for 256 bits that is far beyond any computer.
+
+**Collision resistance.** Two different inputs with the same hash must exist, because there are infinitely many inputs and only 2²⁵⁶ possible hashes. But nobody knows how to find such a pair for SHA-256.
+
+## Why a blockchain needs it
+
+A hash works as a fingerprint. Keep the hash of a document, and later you can tell whether the document changed by hashing it again and comparing. A blockchain uses this idea everywhere: each block contains the hash of the block before it (lesson 2), mining searches for hashes of a special shape (lesson 3), and a Merkle tree sums up thousands of transactions in a single hash (lesson 4).
+
+<Note label="Check it yourself">
+  The hash of the three letters `abc` is
+  `ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`, the value published by NIST.
+  Type `abc` in the widget and compare.
+</Note>
+
+<Note label="In real systems">
+  Bitcoin hashes block headers and transactions twice with SHA-256 (“double SHA-256”). Ethereum uses
+  a different function, Keccak-256. The principle is the same.
+</Note>

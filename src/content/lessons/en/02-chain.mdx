@@ -1,0 +1,43 @@
+---
+order: 2
+title: 'Blocks and the chain: tampering shows'
+summary: 'Each block stores the hash of the block before it. Change an old block and its hash changes, so every block after it stops matching.'
+keyPoints:
+  - 'A block groups data with a header, and the header includes the hash of the previous block.'
+  - 'Changing old data changes that block’s hash and breaks the link from the next block, and from every block after it.'
+  - 'To hide the change, every following block would have to be redone. Lesson 3 shows why that is expensive.'
+widget: chain
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008)'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Reference: block chain and block headers'
+    url: 'https://developer.bitcoin.org/reference/block_chain.html'
+  - title: 'Stuart Haber and W. Scott Stornetta, How to time-stamp a digital document (1991)'
+    url: 'https://doi.org/10.1007/BF00196791'
+---
+
+## A block is data plus a header
+
+A block collects a batch of records; in Bitcoin, transactions. Its header carries, among other fields, the hash of the previous block’s header and a number called the nonce. The hash of the header is what identifies the block.
+
+In the widget, each block’s hash covers four things written one after the other: its number, the previous hash, the nonce and the data (`number|previous hash|nonce|data`).
+
+## The chain is made of hashes
+
+Because each block contains the previous block’s hash, the blocks form a chain: block 3 points to block 2, which points to block 1. Change anything in block 2 and its hash changes. Block 3 now carries a different previous hash, so its own hash changes as well, and so on to the end of the chain.
+
+<Widget />
+
+Edit the data of block 2: that block and every block after it get the grease cross. Press “Mine” on block 2 and it becomes valid again, but block 3 is still broken, because the previous hash it contains has changed. Repairing history means redoing every block that came after.
+
+## Valid means “the work was done”
+
+In this toy chain a block is valid when its hash starts with `000`. The nonce is the number that was changed until that happened: this is proof of work, the subject of the next lesson. Without it, recomputing all the hashes would take a fraction of a second and the chain would protect nothing.
+
+The idea of linking records through their hashes is older than Bitcoin: it comes from research on digital time-stamping by Haber and Stornetta in 1991, which the Bitcoin whitepaper cites.
+
+<Note label="Simplification">
+  A real Bitcoin header is 80 bytes with six fields (version, previous hash, Merkle root, time,
+  difficulty target and nonce), and the transactions enter the header only through their Merkle root
+  (lesson 4). Here the data is hashed directly, to keep the mechanism visible.
+</Note>

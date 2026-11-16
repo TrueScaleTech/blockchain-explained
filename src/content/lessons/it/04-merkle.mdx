@@ -1,0 +1,46 @@
+---
+order: 4
+title: 'Alberi di Merkle: un hash per molte transazioni'
+summary: 'Un albero di Merkle combina gli hash delle transazioni a coppie, poi le coppie di coppie, fino a una sola radice. Pochi hash bastano a provare che una transazione è in un blocco.'
+keyPoints:
+  - 'Le foglie sono gli hash delle transazioni, ogni nodo padre è l’hash dei suoi due figli e in cima c’è la radice.'
+  - 'L’intestazione del blocco conserva solo la radice, eppure la radice cambia se cambia una qualsiasi transazione.'
+  - 'Una prova di inclusione richiede un hash per livello, circa log₂(n): 12 hash per 4.000 transazioni.'
+  - 'Quando un livello ha un numero dispari di nodi, Bitcoin accoppia l’ultimo nodo con una sua copia.'
+widget: merkle
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), sezioni 7 e 8'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Reference: Merkle trees'
+    url: 'https://developer.bitcoin.org/reference/block_chain.html#merkle-trees'
+  - title: 'Ralph C. Merkle, A Digital Signature Based on a Conventional Encryption Function (1987)'
+    url: 'https://doi.org/10.1007/3-540-48184-2_32'
+---
+
+## Hash a coppie
+
+Si parte dalle transazioni di un blocco e si calcola l’hash di ciascuna: sono le foglie. Si uniscono le foglie due a due e si calcola l’hash di ogni coppia, poi si fa lo stesso con i risultati, finché resta un solo hash: la radice di Merkle. Bitcoin usa il doppio SHA-256 a ogni passaggio.
+
+L’intestazione del blocco contiene solo la radice, non le transazioni. Siccome ogni hash dipende da quelli sotto, cambiare una sola transazione cambia la sua foglia, il suo nodo padre e tutti gli hash fino alla radice, e l’intestazione non corrisponde più.
+
+<Widget />
+
+Scegli una transazione: i nodi bianchi sono il suo percorso fino alla radice, quelli arancioni sono la prova, cioè gli hash fratelli che servono per ricostruire la radice. Modifica una transazione e tutto il suo percorso cambia.
+
+## Provare una transazione senza le altre
+
+Per mostrare che una transazione è in un blocco non servono tutte le altre transazioni: bastano gli hash fratelli lungo il suo percorso. Chi verifica calcola l’hash della transazione insieme al primo fratello, poi quello del risultato insieme al successivo, e così via. Se l’ultimo hash coincide con la radice nell’intestazione del blocco, la transazione è nel blocco.
+
+La prova cresce con il numero di livelli, non con il numero di transazioni. Il whitepaper di Bitcoin la chiama verifica semplificata dei pagamenti: un portafoglio leggero conserva solo le intestazioni dei blocchi e chiede le prove alla rete.
+
+<Note label="Verifica da te">
+  I test di questo sito ricostruiscono la radice di Merkle del blocco Bitcoin 100.000 a partire dai
+  suoi quattro identificativi di transazione e la confrontano con la radice pubblicata,
+  `f3e94742…a25a95766`.
+</Note>
+
+<Note label="Semplificazione">
+  Qui le foglie sono il doppio SHA-256 del testo che scrivi, e ogni nodo mostra solo i primi 8
+  caratteri esadecimali. In Bitcoin le foglie sono gli identificativi delle transazioni, che gli
+  explorer mostrano con i byte in ordine inverso.
+</Note>

@@ -1,0 +1,43 @@
+---
+order: 5
+title: 'Digital signatures: who may spend'
+summary: 'A private key signs and the matching public key verifies. A signature proves that the holder of the key approved exactly that message, without revealing the key.'
+keyPoints:
+  - 'A key pair is a private key, kept secret, and a public key, which anyone may see.'
+  - 'Only the private key can produce a signature that the public key accepts.'
+  - 'The signature covers the exact message: change one character and verification fails.'
+  - 'In a blockchain a transaction is valid only if it carries a signature from the key that controls the coins.'
+widget: signature
+sources:
+  - title: 'NIST FIPS 186-5, Digital Signature Standard (DSS)'
+    url: 'https://csrc.nist.gov/pubs/fips/186-5/final'
+  - title: 'RFC 6979, Deterministic Usage of DSA and ECDSA'
+    url: 'https://www.rfc-editor.org/rfc/rfc6979'
+  - title: 'SEC 2: Recommended Elliptic Curve Domain Parameters (secp256k1)'
+    url: 'https://www.secg.org/sec2-v2.pdf'
+  - title: 'BIP 340: Schnorr Signatures for secp256k1'
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki'
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), section 2'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+---
+
+## Two keys that belong together
+
+Public-key cryptography uses pairs of keys created together. The private key stays with its owner; the public key can be published. Anything signed with the private key can be checked by anyone who has the public key. The public key cannot be used to sign, and the private key cannot be worked out from it.
+
+<Widget />
+
+Sign the message, then change the received copy by one character: verification fails. Switch to someone else’s public key: it fails too. A valid signature ties this exact message to this exact key.
+
+## What signatures do in a blockchain
+
+A blockchain has no accounts protected by passwords. Coins are locked to a public key; in Bitcoin, usually to an address derived from the hash of a public key. To spend them, a transaction must carry a signature made with the matching private key, and every node checks that signature before accepting the transaction. So nobody can spend coins locked to someone else’s key, not even a miner with enormous computing power.
+
+Signatures decide who may spend; proof of work decides the order of the transactions. And whoever holds the private key controls the coins: if the key is lost, nobody can sign for them again, and if it is stolen, the thief can.
+
+<Note label="Simplification">
+  The widget uses ECDSA on the P-256 curve, which browsers support natively. Bitcoin and Ethereum
+  use ECDSA on a different curve, secp256k1, and Bitcoin has also supported Schnorr signatures (BIP
+  340) since the Taproot upgrade of 2021. The principle is the same. The widget’s keys are created
+  in memory, cannot be exported and disappear when you leave the page.
+</Note>

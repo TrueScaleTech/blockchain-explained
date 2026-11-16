@@ -1,0 +1,44 @@
+---
+order: 2
+title: 'Blocchi e catena: la manomissione si vede'
+summary: 'Ogni blocco conserva l’hash del blocco precedente. Se si cambia un blocco vecchio il suo hash cambia, e tutti i blocchi successivi smettono di corrispondere.'
+keyPoints:
+  - 'Un blocco raccoglie dei dati insieme a un’intestazione, e l’intestazione contiene l’hash del blocco precedente.'
+  - 'Cambiare un dato vecchio cambia l’hash di quel blocco e rompe il collegamento con il blocco successivo, e con tutti quelli dopo.'
+  - 'Per nascondere la modifica bisognerebbe rifare tutti i blocchi successivi. La lezione 3 mostra perché costa tanto.'
+widget: chain
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008)'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Reference: block chain and block headers'
+    url: 'https://developer.bitcoin.org/reference/block_chain.html'
+  - title: 'Stuart Haber e W. Scott Stornetta, How to time-stamp a digital document (1991)'
+    url: 'https://doi.org/10.1007/BF00196791'
+---
+
+## Un blocco è fatto di dati e di un’intestazione
+
+Un blocco raccoglie un gruppo di registrazioni; in Bitcoin, transazioni. La sua intestazione contiene, tra gli altri campi, l’hash dell’intestazione del blocco precedente e un numero chiamato nonce. È l’hash dell’intestazione a identificare il blocco.
+
+Nel widget l’hash di ogni blocco copre quattro elementi scritti uno dopo l’altro: il numero del blocco, l’hash precedente, il nonce e i dati (`numero|hash precedente|nonce|dati`).
+
+## La catena è fatta di hash
+
+Poiché ogni blocco contiene l’hash del precedente, i blocchi formano una catena: il blocco 3 punta al blocco 2, che punta al blocco 1. Se cambia qualcosa nel blocco 2, cambia il suo hash. Il blocco 3 ora contiene un hash precedente diverso, quindi cambia anche il suo hash, e così via fino alla fine della catena.
+
+<Widget />
+
+Modifica i dati del blocco 2: quel blocco e tutti quelli successivi ricevono la croce. Premi “Mina” sul blocco 2 e torna valido, ma il blocco 3 resta rotto, perché l’hash precedente che contiene è cambiato. Riparare la storia significa rifare tutti i blocchi venuti dopo.
+
+## Valido vuol dire “il lavoro è stato fatto”
+
+In questa catena di prova un blocco è valido quando il suo hash inizia con `000`. Il nonce è il numero che è stato cambiato finché non è successo: è la proof of work, l’argomento della prossima lezione. Senza di essa ricalcolare tutti gli hash richiederebbe una frazione di secondo e la catena non proteggerebbe nulla.
+
+L’idea di collegare le registrazioni attraverso i loro hash è più vecchia di Bitcoin: viene dalle ricerche sulla marcatura temporale digitale di Haber e Stornetta del 1991, citate nel whitepaper di Bitcoin.
+
+<Note label="Semplificazione">
+  Una vera intestazione Bitcoin è lunga 80 byte e ha sei campi (versione, hash precedente, radice di
+  Merkle, orario, bersaglio di difficoltà e nonce), e le transazioni entrano nell’intestazione solo
+  attraverso la loro radice di Merkle (lezione 4). Qui i dati entrano direttamente nell’hash, per
+  lasciare visibile il meccanismo.
+</Note>

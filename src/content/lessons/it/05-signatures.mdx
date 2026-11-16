@@ -1,0 +1,43 @@
+---
+order: 5
+title: 'Firme digitali: chi può spendere'
+summary: 'La chiave privata firma, la chiave pubblica corrispondente verifica. Una firma prova che chi possiede la chiave ha approvato proprio quel messaggio, senza rivelare la chiave.'
+keyPoints:
+  - 'Una coppia di chiavi è formata da una chiave privata, tenuta segreta, e da una chiave pubblica, che chiunque può vedere.'
+  - 'Solo la chiave privata può produrre una firma che la chiave pubblica accetta.'
+  - 'La firma copre il messaggio esatto: cambiando un carattere la verifica fallisce.'
+  - 'In una blockchain una transazione è valida solo se porta una firma della chiave che controlla le monete.'
+widget: signature
+sources:
+  - title: 'NIST FIPS 186-5, Digital Signature Standard (DSS)'
+    url: 'https://csrc.nist.gov/pubs/fips/186-5/final'
+  - title: 'RFC 6979, Deterministic Usage of DSA and ECDSA'
+    url: 'https://www.rfc-editor.org/rfc/rfc6979'
+  - title: 'SEC 2: Recommended Elliptic Curve Domain Parameters (secp256k1)'
+    url: 'https://www.secg.org/sec2-v2.pdf'
+  - title: 'BIP 340: Schnorr Signatures for secp256k1'
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki'
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), sezione 2'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+---
+
+## Due chiavi che vanno insieme
+
+La crittografia a chiave pubblica usa coppie di chiavi create insieme. La chiave privata resta a chi la possiede; la chiave pubblica si può pubblicare. Tutto ciò che viene firmato con la chiave privata può essere verificato da chiunque abbia la chiave pubblica. La chiave pubblica non serve a firmare, e da essa non si può ricavare la chiave privata.
+
+<Widget />
+
+Firma il messaggio, poi cambia di un carattere la copia ricevuta: la verifica fallisce. Passa alla chiave pubblica di un’altra persona: fallisce anche così. Una firma valida lega proprio questo messaggio a proprio questa chiave.
+
+## Che cosa fanno le firme in una blockchain
+
+Una blockchain non ha account protetti da password. Le monete sono vincolate a una chiave pubblica; in Bitcoin, di solito a un indirizzo ricavato dall’hash di una chiave pubblica. Per spenderle, una transazione deve portare una firma fatta con la chiave privata corrispondente, e ogni nodo controlla quella firma prima di accettare la transazione. Così nessuno può spendere monete vincolate alla chiave di un altro, nemmeno chi mina con un’enorme potenza di calcolo.
+
+Le firme decidono chi può spendere; la proof of work decide l’ordine delle transazioni. E chi possiede la chiave privata controlla le monete: se la chiave va persa nessuno potrà più firmare per esse, se viene rubata chi l’ha rubata sì.
+
+<Note label="Semplificazione">
+  Il widget usa ECDSA sulla curva P-256, che i browser supportano direttamente. Bitcoin ed Ethereum
+  usano ECDSA su una curva diversa, secp256k1, e Bitcoin supporta anche le firme Schnorr (BIP 340)
+  dall’aggiornamento Taproot del 2021. Il principio è lo stesso. Le chiavi del widget sono create in
+  memoria, non si possono esportare e spariscono quando lasci la pagina.
+</Note>

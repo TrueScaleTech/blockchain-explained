@@ -1,0 +1,45 @@
+---
+order: 4
+title: 'Merkle trees: one hash for many transactions'
+summary: 'A Merkle tree hashes transactions in pairs, then pairs of pairs, up to a single root. A handful of hashes is enough to prove that one transaction is in a block.'
+keyPoints:
+  - 'The leaves are the hashes of the transactions, each parent is the hash of its two children, and the top is the root.'
+  - 'The block header stores only the root, yet the root changes if any transaction changes.'
+  - 'A proof of inclusion needs one hash per level, about log₂(n): 12 hashes for 4,000 transactions.'
+  - 'When a level has an odd number of nodes, Bitcoin pairs the last node with a copy of itself.'
+widget: merkle
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), sections 7 and 8'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Reference: Merkle trees'
+    url: 'https://developer.bitcoin.org/reference/block_chain.html#merkle-trees'
+  - title: 'Ralph C. Merkle, A Digital Signature Based on a Conventional Encryption Function (1987)'
+    url: 'https://doi.org/10.1007/3-540-48184-2_32'
+---
+
+## Hashing in pairs
+
+Start from the transactions of a block and hash each one: these are the leaves. Join the leaves two by two and hash each pair, then do the same with the results, until a single hash is left: the Merkle root. Bitcoin uses double SHA-256 at every step.
+
+The block header contains only the root, not the transactions. Because every hash depends on the ones below it, changing a single transaction changes its leaf, its parent and every hash up to the root, and the header no longer matches.
+
+<Widget />
+
+Pick a transaction: the white nodes are its path to the root, and the orange ones are the proof, the sibling hashes needed to rebuild the root. Edit a transaction and its whole path changes.
+
+## Proving one transaction without the others
+
+To show that a transaction is in a block you do not need all the other transactions: the sibling hashes along its path are enough. Whoever checks hashes the transaction with the first sibling, the result with the next one, and so on. If the last hash equals the root in the block header, the transaction is in the block.
+
+The proof grows with the number of levels, not with the number of transactions. The Bitcoin whitepaper calls this simplified payment verification: a light wallet keeps only the block headers and asks the network for proofs.
+
+<Note label="Check it yourself">
+  The tests of this site rebuild the Merkle root of Bitcoin block 100,000 from its four transaction
+  ids and compare it with the published root, `f3e94742…a25a95766`.
+</Note>
+
+<Note label="Simplification">
+  The leaves here are the double SHA-256 of the text you type, and each node shows only its first 8
+  hex characters. In Bitcoin the leaves are the transaction ids, which explorers display with their
+  bytes in reverse order.
+</Note>

@@ -1,0 +1,259 @@
+---
+import { isLocale } from '../../i18n';
+import { buildTree, proofFor, rootOf, sha256d } from '../../lib/merkle';
+import { NODE, levelSizes, merkleLayout } from '../../lib/merkle-layout';
+import { toHex, utf8 } from '../../lib/sha256';
+import { WIDGET_STRINGS, fill } from '../../widget-strings';
+import Bench from './Bench.astro';
+
+const START_LEAVES = 6;
+const locale = isLocale(Astro.params.lang) ? Astro.params.lang : 'en';
+const s = WIDGET_STRINGS[locale].merkle;
+const texts = s.leaves.slice(0, START_LEAVES);
+
+// The starting tree is computed at build time and drawn as a static figure, with the proof
+// for the first transaction highlighted.
+const leaves = await Promise.all(texts.map((text) => sha256d(utf8(text))));
+const levels = await buildTree(leaves);
+const layout = merkleLayout(levelSizes(texts.length));
+const proof = proofFor(levels, 0);
+
+const pathIndex = (level: number) => Math.floor(0 / 2 ** level);
+const siblingIndex = (level: number) => pathIndex(level) ^ 1;
+const hexOf = (level: number, index: number) =>
+  toHex(levels[level]![index] ?? levels[level]![index - 1]!).slice(0, 8);
+const roleOf = (level: number, index: number) => {
+  if (index === pathIndex(level)) return 'on-path';
+  if (level < levels.length - 1 && index === siblingIndex(level)) return 'sibling';
+  return '';
+};
+const rootHex = toHex(rootOf(levels));
+---
+
+<Bench name="merkle" locale={locale} title={s.title} hint={s.hint} strings={s}>
+  <div class="leaf-editor live" hidden>
+    <ol class="leaf-list"></ol>
+    <div class="leaf-actions">
+      <button class="btn ghost add" type="button">
+        {s.add}
+      </button>
+      <button class="btn ghost remove" type="button">
+        {s.remove}
+      </button>
+    </div>
+  </div>
+  <div class="pick live" hidden role="group" aria-label={s.hint}></div>
+  <figure class="tree">
+    <svg
+      viewBox={`0 0 ${layout.width} ${layout.height}`}
+      width={layout.width}
+      height={layout.height}
+      role="img"
+      aria-label={`${s.root}: ${rootHex}`}
+    >
+      {layout.edges.map((edge) => (
+        <line
+          class:list={[
+            'edge',
+            roleOf(edge.from.level, edge.from.index) === 'on-path' && 'on-path',
+            edge.from.ghost && 'ghost',
+          ]}
+          x1={edge.from.x}
+          y1={edge.from.y - NODE.height / 2}
+          x2={edge.to.x}
+          y2={edge.to.y + NODE.height / 2}
+        />
+      ))}
+      {layout.nodes.map((node) => (
+        <g
+          class:list={['node', roleOf(node.level, node.index), node.ghost && 'ghost']}
+          transform={`translate(${node.x - NODE.width / 2} ${node.y - NODE.height / 2})`}
+        >
+          <rect width={NODE.width} height={NODE.height} />
+          <text x={NODE.width / 2} y={NODE.height / 2 + 4} text-anchor="middle">
+            {node.ghost ? s.copy : hexOf(node.level, node.index)}
+          </text>
+        </g>
+      ))}
+      {layout.nodes
+        .filter((node) => node.level === 0 && !node.ghost)
+        .map((node) => (
+          <text class="leaf-label" x={node.x} y={layout.height - 1} text-anchor="middle">
+            T{node.index + 1}
+          </text>
+        ))}
+    </svg>
+  </figure>
+  <p class="readout" aria-live="polite">
+    <span class="proof-size">{fill(s.proofSize, { k: proof.length, n: texts.length })}</span>
+    <span class="proof-check">{s.verifies}</span>
+  </p>
+  <p class="out root-line">
+    <span class="lab">{s.root}</span> <span class="root">{rootHex}</span>
+  </p>
+</Bench>
+
+<script>
+  import { buildTree, proofFor, rootOf, sha256d, verifyProof } from '../../lib/merkle';
+  import { NODE, levelSizes, merkleLayout } from '../../lib/merkle-layout';
+  import { toHex, utf8 } from '../../lib/sha256';
+  import type { WidgetStrings } from '../../widget-strings';
+  import { $, fill, goLive, latest, widgets } from './client';
+
+  const SVG = 'http://www.w3.org/2000/svg';
+  const MIN = 2;
+  const MAX = 8;
+
+  function svg<K extends keyof SVGElementTagNameMap>(
+    tag: K,
+    attrs: Record<string, string | number>,
+  ): SVGElementTagNameMap[K] {
+    const el = document.createElementNS(SVG, tag);
+    for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, String(value));
+    return el;
+  }
+
+  for (const { root, s } of widgets<WidgetStrings['merkle']>('merkle')) {
+    const list = $(root, '.leaf-list');
+    const pick = $(root, '.pick');
+    const figure = $<SVGSVGElement>(root, '.tree svg');
+    const proofSize = $(root, '.proof-size');
+    const proofCheck = $(root, '.proof-check');
+    const rootOut = $(root, '.root');
+    const add = $<HTMLButtonElement>(root, '.add');
+    const remove = $<HTMLButtonElement>(root, '.remove');
+    const turn = latest();
+    const texts = s.leaves.slice(0, 6);
+    let selected = 0;
+
+    const draw = async () => {
+      const t = turn.next();
+      const leaves = await Promise.all(texts.map((text) => sha256d(utf8(text))));
+      const levels = await buildTree(leaves);
+      const proof = proofFor(levels, selected);
+      const rootHash = rootOf(levels);
+      const ok = await verifyProof(leaves[selected]!, proof, rootHash);
+      if (!turn.isCurrent(t)) return;
+
+      const layout = merkleLayout(levelSizes(texts.length));
+      const pathIndex = (level: number) => Math.floor(selected / 2 ** level);
+      const role = (level: number, index: number) => {
+        if (index === pathIndex(level)) return 'on-path';
+        if (level < levels.length - 1 && index === (pathIndex(level) ^ 1)) return 'sibling';
+        return '';
+      };
+      figure.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
+      figure.setAttribute('width', String(layout.width));
+      figure.setAttribute('height', String(layout.height));
+      figure.setAttribute('aria-label', `${s.root}: ${toHex(rootHash)}`);
+      figure.replaceChildren();
+      for (const edge of layout.edges) {
+        const line = svg('line', {
+          x1: edge.from.x,
+          y1: edge.from.y - NODE.height / 2,
+          x2: edge.to.x,
+          y2: edge.to.y + NODE.height / 2,
+        });
+        line.classList.add('edge');
+        if (role(edge.from.level, edge.from.index) === 'on-path') line.classList.add('on-path');
+        if (edge.from.ghost) line.classList.add('ghost');
+        figure.append(line);
+      }
+      for (const node of layout.nodes) {
+        const g = svg('g', {
+          transform: `translate(${node.x - NODE.width / 2} ${node.y - NODE.height / 2})`,
+        });
+        g.classList.add('node');
+        const r = role(node.level, node.index);
+        if (r) g.classList.add(r);
+        if (node.ghost) g.classList.add('ghost');
+        g.append(svg('rect', { width: NODE.width, height: NODE.height }));
+        const label = svg('text', {
+          x: NODE.width / 2,
+          y: NODE.height / 2 + 4,
+          'text-anchor': 'middle',
+        });
+        const bytes = levels[node.level]![node.index] ?? levels[node.level]![node.index - 1]!;
+        label.textContent = node.ghost ? s.copy : toHex(bytes).slice(0, 8);
+        g.append(label);
+        figure.append(g);
+      }
+      for (const node of layout.nodes.filter((n) => n.level === 0 && !n.ghost)) {
+        const label = svg('text', {
+          x: node.x,
+          y: layout.height - 1,
+          'text-anchor': 'middle',
+        });
+        label.classList.add('leaf-label');
+        label.textContent = `T${node.index + 1}`;
+        figure.append(label);
+      }
+
+      proofSize.textContent = `${fill(s.proofFor, { n: selected + 1 })}: ${fill(s.proofSize, {
+        k: proof.length,
+        n: texts.length,
+      })}`;
+      proofCheck.textContent = ok ? s.verifies : s.fails;
+      rootOut.textContent = toHex(rootHash);
+    };
+
+    const renderControls = () => {
+      list.replaceChildren(
+        ...texts.map((text, i) => {
+          const li = document.createElement('li');
+          const label = document.createElement('label');
+          label.htmlFor = `merkle-leaf-${i}`;
+          label.textContent = `${s.tx} T${i + 1}`;
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = `merkle-leaf-${i}`;
+          input.value = text;
+          input.maxLength = 60;
+          input.spellcheck = false;
+          input.addEventListener('input', () => {
+            texts[i] = input.value;
+            void draw();
+          });
+          li.append(label, input);
+          return li;
+        }),
+      );
+      pick.replaceChildren(
+        ...texts.map((_, i) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'chip';
+          button.textContent = `T${i + 1}`;
+          button.setAttribute('aria-pressed', String(i === selected));
+          button.setAttribute('aria-label', fill(s.proofFor, { n: i + 1 }));
+          button.addEventListener('click', () => {
+            selected = i;
+            renderControls();
+            void draw();
+          });
+          return button;
+        }),
+      );
+      add.disabled = texts.length >= MAX;
+      remove.disabled = texts.length <= MIN;
+    };
+
+    add.addEventListener('click', () => {
+      if (texts.length >= MAX) return;
+      texts.push(s.leaves[texts.length] ?? `T${texts.length + 1}`);
+      renderControls();
+      void draw();
+    });
+    remove.addEventListener('click', () => {
+      if (texts.length <= MIN) return;
+      texts.pop();
+      selected = Math.min(selected, texts.length - 1);
+      renderControls();
+      void draw();
+    });
+
+    renderControls();
+    goLive(root);
+    void draw();
+  }
+</script>

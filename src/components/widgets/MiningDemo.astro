@@ -1,0 +1,204 @@
+---
+import { isLocale } from '../../i18n';
+import {
+  CHART,
+  expectedMiningPath,
+  miningScales,
+  miningXTicks,
+  miningYTicks,
+} from '../../lib/charts';
+import { MAX_DIFFICULTY, expectedAttempts } from '../../lib/pow';
+import { WIDGET_STRINGS, fill } from '../../widget-strings';
+import Bench from './Bench.astro';
+
+const START_DIFFICULTY = 3;
+const locale = isLocale(Astro.params.lang) ? Astro.params.lang : 'en';
+const s = WIDGET_STRINGS[locale].mining;
+const format = new Intl.NumberFormat(locale);
+const { x, y } = miningScales();
+const yLabel = (v: number) =>
+  new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 0 }).format(v);
+const plotLeft = CHART.left;
+const plotRight = CHART.width - CHART.right;
+const plotTop = CHART.top;
+const plotBottom = CHART.height - CHART.bottom;
+---
+
+<Bench name="mining" locale={locale} title={s.title} hint={s.hint} strings={s}>
+  <div class="mine-controls live" hidden>
+    <div>
+      <label for="mine-data">{s.data}</label>
+      <input
+        id="mine-data"
+        class="mine-data"
+        type="text"
+        value={s.start}
+        maxlength="80"
+        spellcheck="false"
+      />
+    </div>
+    <div>
+      <label for="mine-difficulty">
+        {s.difficulty}: <span class="zeros">{fill(s.zeros, { n: START_DIFFICULTY })}</span>
+      </label>
+      <input
+        id="mine-difficulty"
+        class="mine-difficulty"
+        type="range"
+        min="1"
+        max={MAX_DIFFICULTY}
+        step="1"
+        value={START_DIFFICULTY}
+      />
+    </div>
+    <div class="mine-go">
+      <button class="btn mine-button" type="button">
+        {s.mine}
+      </button>
+    </div>
+  </div>
+  <p class="slow muted live" hidden>
+    {s.slow}
+  </p>
+  <p class="readout" aria-live="polite">
+    <span>
+      {s.attempts}
+      <b class="attempts">0</b>
+    </span>
+    <span>
+      {s.expected}
+      <b class="expected">{format.format(expectedAttempts(START_DIFFICULTY))}</b>
+    </span>
+    <span class="result muted"></span>
+  </p>
+  <div class="mine-last live" hidden>
+    <span class="lab">{s.nonce}</span>
+    <div class="out nonce">–</div>
+    <span class="lab">{s.hash}</span>
+    <div class="out hash">–</div>
+  </div>
+  <figure class="chart">
+    <svg viewBox={`0 0 ${CHART.width} ${CHART.height}`} role="img" aria-label={s.chart}>
+      <g class="grid">
+        {miningYTicks().map((tick) => (
+          <>
+            <line x1={plotLeft} x2={plotRight} y1={tick.at} y2={tick.at} />
+            <text x={plotLeft - 8} y={tick.at + 4} text-anchor="end">
+              {yLabel(tick.value)}
+            </text>
+          </>
+        ))}
+        {miningXTicks().map((tick) => (
+          <text x={tick.at} y={plotBottom + 20} text-anchor="middle">
+            {tick.value}
+          </text>
+        ))}
+        <line class="axis" x1={plotLeft} x2={plotRight} y1={plotBottom} y2={plotBottom}></line>
+        <text
+          class="axis-label"
+          x={(plotLeft + plotRight) / 2}
+          y={CHART.height - 4}
+          text-anchor="middle"
+        >
+          {s.axisX}
+        </text>
+        <text class="axis-label" x={plotLeft} y={plotTop - 4}>
+          {s.axisY}
+        </text>
+      </g>
+      <path class="expected-line" d={expectedMiningPath()}></path>
+      {Array.from({ length: MAX_DIFFICULTY }, (_, i) => (
+        <circle class="expected-dot" cx={x(i + 1)} cy={y(expectedAttempts(i + 1))} r="4" />
+      ))}
+      <g class="runs"></g>
+    </svg>
+    <figcaption>
+      <span class="key key-expected">{s.expectedLine}</span>
+      <span class="key key-runs live" hidden>
+        {s.yourRuns}
+      </span>
+    </figcaption>
+  </figure>
+</Bench>
+
+<script>
+  import { miningPoint } from '../../lib/charts';
+  import { expectedAttempts, mine } from '../../lib/pow';
+  import { sha256Hex } from '../../lib/sha256';
+  import type { WidgetStrings } from '../../widget-strings';
+  import { $, fill, goLive, numberFormat, widgets, writeMarked } from './client';
+
+  const SVG = 'http://www.w3.org/2000/svg';
+
+  for (const { root, s } of widgets<WidgetStrings['mining']>('mining')) {
+    const data = $<HTMLInputElement>(root, '.mine-data');
+    const range = $<HTMLInputElement>(root, '.mine-difficulty');
+    const button = $<HTMLButtonElement>(root, '.mine-button');
+    const zeros = $(root, '.zeros');
+    const attempts = $(root, '.attempts');
+    const expected = $(root, '.expected');
+    const result = $(root, '.result');
+    const nonceOut = $(root, '.nonce');
+    const hashOut = $(root, '.hash');
+    const slow = $(root, '.slow');
+    const runs = $<SVGGElement>(root, '.runs');
+    const format = numberFormat();
+    let controller: AbortController | null = null;
+
+    const difficulty = () => Number(range.value);
+    const syncDifficulty = () => {
+      zeros.textContent = fill(s.zeros, { n: difficulty() });
+      expected.textContent = format.format(expectedAttempts(difficulty()));
+      slow.hidden = difficulty() < 5;
+    };
+    range.addEventListener('input', syncDifficulty);
+
+    button.addEventListener('click', async () => {
+      if (controller) {
+        controller.abort();
+        return;
+      }
+      controller = new AbortController();
+      const d = difficulty();
+      const text = data.value;
+      button.textContent = s.stop;
+      range.disabled = true;
+      data.disabled = true;
+      result.textContent = '';
+      let count = 0;
+      // Real miners do not all start from zero; a random start makes each run a fresh draw,
+      // so repeated runs show how much the luck varies around the average.
+      const startNonce = globalThis.crypto.getRandomValues(new Uint32Array(1))[0]! % 1_000_000_000;
+      const found = await mine(async (nonce) => sha256Hex(`${text}|${nonce}`), d, {
+        startNonce,
+        signal: controller.signal,
+        onProgress: (n) => {
+          count = n;
+          attempts.textContent = format.format(n);
+        },
+      });
+      if (found) {
+        attempts.textContent = format.format(found.attempts);
+        result.textContent = fill(s.found, { n: format.format(found.attempts) });
+        nonceOut.textContent = format.format(found.nonce);
+        writeMarked(hashOut, found.hash, (i) => i < d);
+        const { cx, cy } = miningPoint(d, found.attempts);
+        const dot = document.createElementNS(SVG, 'circle');
+        // Spread repeated runs a little sideways so they stay visible.
+        dot.setAttribute('cx', String(cx + (runs.childElementCount % 5) * 4 - 8));
+        dot.setAttribute('cy', String(cy));
+        dot.setAttribute('r', '5');
+        runs.append(dot);
+      } else {
+        result.textContent = fill(s.stopped, { n: format.format(count) });
+      }
+      controller = null;
+      button.textContent = s.mine;
+      range.disabled = false;
+      data.disabled = false;
+    });
+
+    goLive(root);
+    syncDifficulty();
+  }
+</script>

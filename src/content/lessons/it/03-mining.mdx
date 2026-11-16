@@ -1,0 +1,41 @@
+---
+order: 3
+title: 'Mining: la proof of work'
+summary: 'Per aggiungere un blocco, chi mina deve trovare un nonce che dia al blocco un hash della forma richiesta. Non ci sono scorciatoie, solo tentativi, ed è questo che rende costoso riscrivere la storia.'
+keyPoints:
+  - 'L’unico modo per trovare un nonce valido è provarne uno dopo l’altro, e ogni tentativo è un hash.'
+  - 'Ogni zero iniziale in più moltiplica per 16 il numero di tentativi attesi.'
+  - 'Controllare una soluzione richiede un solo hash: il lavoro è difficile da fare e facile da verificare.'
+  - 'Bitcoin aggiorna il bersaglio ogni 2016 blocchi per mantenere circa un blocco ogni dieci minuti.'
+widget: mining
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), sezione 4'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Reference: block headers and the target'
+    url: 'https://developer.bitcoin.org/reference/block_chain.html'
+  - title: 'ethereum.org: Proof-of-work (PoW)'
+    url: 'https://ethereum.org/en/developers/docs/consensus-mechanisms/pow/'
+---
+
+## Una lotteria che si gioca con gli hash
+
+Gli hash sono imprevedibili (lezione 1), quindi non c’è modo di calcolare quale nonce darà un hash che inizia con degli zeri. Chi mina cambia il nonce, calcola l’hash, controlla e ricomincia. Ogni carattere esadecimale è uno di 16 valori, quindi in media un hash inizia con uno zero una volta su 16 tentativi, con due zeri una volta su 256 e con cinque zeri circa una volta su un milione.
+
+<Widget />
+
+Prova il widget più volte con la stessa difficoltà: il numero di tentativi cambia molto da una prova all’altra, ma in media segue la linea tratteggiata. Poi aggiungi uno zero e guarda il costo crescere di circa sedici volte.
+
+## Difficile da fare, facile da controllare
+
+Trovare il nonce ha richiesto migliaia di hash; chiunque può verificarlo con uno solo. Questa asimmetria è il punto. Per cambiare un blocco vecchio, chi attacca deve rifare la proof of work di quel blocco e di tutti quelli successivi (lezione 2), mentre la rete onesta continua ad aggiungerne di nuovi in cima. La lezione 6 calcola le probabilità dell’attaccante.
+
+## La difficoltà si adatta
+
+In Bitcoin il bersaglio non è un numero di zeri ma un numero di 256 bit: l’hash dell’intestazione del blocco, letto come numero, deve essere più basso del bersaglio. Ogni 2016 blocchi la rete ricalcola il bersaglio, in modo che i blocchi continuino ad arrivare circa ogni dieci minuti, qualunque sia la potenza di calcolo che entra o esce.
+
+<Note label="Semplificazione">
+  Qui la difficoltà conta gli zeri esadecimali iniziali e il testo di cui si calcola l’hash è
+  `dati|nonce`. Bitcoin confronta il doppio SHA-256 di un’intestazione di 80 byte con un bersaglio
+  conservato in forma compatta. Ethereum ha smesso di usare la proof of work nel settembre 2022 e
+  oggi usa la proof of stake (lezione 6).
+</Note>

@@ -1,0 +1,96 @@
+---
+import { isLocale } from '../../i18n';
+import { sha256Hex } from '../../lib/sha256';
+import { WIDGET_STRINGS } from '../../widget-strings';
+import Bench from './Bench.astro';
+
+const locale = isLocale(Astro.params.lang) ? Astro.params.lang : 'en';
+const s = WIDGET_STRINGS[locale].hash;
+// The starting hash is computed at build time, so the static page shows a real value.
+const initial = await sha256Hex(s.start);
+---
+
+<Bench name="hash" locale={locale} title={s.title} hint={s.hint} strings={s}>
+  <div class="live" hidden>
+    <label for="hash-input">{s.input}</label>
+    <input
+      id="hash-input"
+      class="hash-input"
+      type="text"
+      value={s.start}
+      maxlength="200"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+  <div class="hash-rows">
+    <div>
+      <span class="lab">
+        {s.reference}: <q class="ref-text">{s.start}</q>
+      </span>
+      <div class="out ref">{initial}</div>
+    </div>
+    <div>
+      <span class="lab">{s.now}</span>
+      <div class="out now">{initial}</div>
+    </div>
+  </div>
+  <p class="readout" aria-live="polite">
+    <span>
+      {s.bits}
+      <b class="bits">0 / 256</b>
+    </span>
+    <span>
+      {s.chars}
+      <b class="chars">0 / 64</b>
+    </span>
+  </p>
+  <div class="live" hidden>
+    <button class="btn ghost pin" type="button">
+      {s.pin}
+    </button>
+  </div>
+</Bench>
+
+<script>
+  import { differingBits, sha256Hex } from '../../lib/sha256';
+  import type { WidgetStrings } from '../../widget-strings';
+  import { $, goLive, latest, widgets, writeMarked } from './client';
+
+  for (const { root } of widgets<WidgetStrings['hash']>('hash')) {
+    const input = $<HTMLInputElement>(root, '.hash-input');
+    const refText = $(root, '.ref-text');
+    const refOut = $(root, '.ref');
+    const nowOut = $(root, '.now');
+    const bits = $(root, '.bits');
+    const chars = $(root, '.chars');
+    const turn = latest();
+    let refHash = refOut.textContent?.trim() ?? '';
+    let nowHash = refHash;
+
+    const render = () => {
+      writeMarked(nowOut, nowHash, (i) => nowHash[i] !== refHash[i]);
+      let changed = 0;
+      for (let i = 0; i < nowHash.length; i++) if (nowHash[i] !== refHash[i]) changed++;
+      bits.textContent = `${differingBits(nowHash, refHash)} / 256`;
+      chars.textContent = `${changed} / 64`;
+    };
+
+    input.addEventListener('input', async () => {
+      const t = turn.next();
+      const hash = await sha256Hex(input.value);
+      if (!turn.isCurrent(t)) return;
+      nowHash = hash;
+      render();
+    });
+
+    $(root, '.pin').addEventListener('click', () => {
+      refHash = nowHash;
+      refText.textContent = input.value;
+      refOut.textContent = refHash;
+      render();
+    });
+
+    goLive(root);
+  }
+</script>

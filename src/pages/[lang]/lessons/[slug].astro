@@ -1,0 +1,105 @@
+---
+import { render } from 'astro:content';
+import Note from '../../../components/Note.astro';
+import Rail from '../../../components/Rail.astro';
+import { WIDGET_COMPONENTS } from '../../../components/widgets';
+import Base from '../../../layouts/Base.astro';
+import { LOCALES, STRINGS, type Locale } from '../../../i18n';
+import { getLessons, slugOf, type Lesson } from '../../../lessons';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of LOCALES) {
+    const lessons = await getLessons(lang);
+    for (const [i, lesson] of lessons.entries()) {
+      paths.push({
+        params: { lang, slug: slugOf(lesson) },
+        props: { lesson, lessons, prev: lessons[i - 1], next: lessons[i + 1] },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  lesson: Lesson;
+  lessons: Lesson[];
+  prev?: Lesson;
+  next?: Lesson;
+}
+
+const { lesson, lessons, prev, next } = Astro.props;
+const locale = Astro.params.lang as Locale;
+const t = STRINGS[locale];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const slug = slugOf(lesson);
+const { Content } = await render(lesson);
+const Widget = WIDGET_COMPONENTS[lesson.data.widget];
+const pad = (n: number) => String(n).padStart(2, '0');
+const href = (l: Lesson) => `${base}/${locale}/lessons/${slugOf(l)}/`;
+---
+
+<Base
+  locale={locale}
+  path={`lessons/${slug}/`}
+  current="lessons"
+  title={lesson.data.title}
+  description={lesson.data.summary}
+>
+  <Rail slot="rail" locale={locale} lessons={lessons} current={slug} />
+  <article class="window">
+    <header class="opener">
+      <p class="where">{t.lessonOf(lesson.data.order, lessons.length)}</p>
+      <h1>{lesson.data.title}</h1>
+      <p class="lede">{lesson.data.summary}</p>
+    </header>
+    <section class="keys" aria-labelledby="key-points">
+      <h2 id="key-points">{t.keyPoints}</h2>
+      <ol>
+        {lesson.data.keyPoints.map((point) => (
+          <li>{point}</li>
+        ))}
+      </ol>
+    </section>
+    <div class="prose">
+      <Content components={{ Widget, Note }} />
+    </div>
+    <section class="sources" aria-labelledby="sources">
+      <h2 id="sources">{t.sources}</h2>
+      <p>{t.sourcesNote}</p>
+      <ul>
+        {lesson.data.sources.map((source) => (
+          <li>
+            <a href={source.url} target="_blank" rel="noopener noreferrer">
+              {source.title}
+              <span class="sr-only"> {t.opensInNewTab}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+    <nav class="pager" aria-label={t.navLessons}>
+      {prev && (
+        <a class="prev" href={href(prev)} rel="prev">
+          <span class="dir">← {t.previous}</span>
+          <span class="to">
+            {pad(prev.data.order)} {prev.data.title.split(':')[0]}
+          </span>
+        </a>
+      )}
+      {next ? (
+        <a class="next" href={href(next)} rel="next">
+          <span class="dir">{t.next} →</span>
+          <span class="to">
+            {pad(next.data.order)} {next.data.title.split(':')[0]}
+          </span>
+        </a>
+      ) : (
+        <a class="next" href={`${base}/${locale}/`}>
+          <span class="dir">{t.backToLessons} →</span>
+          <span class="to">{t.lessonsHeading}</span>
+        </a>
+      )}
+    </nav>
+  </article>
+</Base>

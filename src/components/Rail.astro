@@ -28,6 +28,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
               class="frame"
               href={`${base}/${locale}/lessons/${slug}/`}
               data-slug={slug}
+              aria-label={`${pad(lesson.data.order)} ${shortTitle(lesson)}`}
               aria-current={slug === current ? 'page' : undefined}
             >
               <svg class="flag" viewBox="0 0 26 46" aria-hidden="true">

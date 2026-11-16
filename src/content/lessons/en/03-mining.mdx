@@ -1,0 +1,40 @@
+---
+order: 3
+title: 'Mining: proof of work'
+summary: 'To add a block, a miner must find a nonce that gives the block a hash of a required shape. There is no shortcut, only trying, and that is what makes rewriting history expensive.'
+keyPoints:
+  - 'The only way to find a valid nonce is to try one after another, and every try is a hash.'
+  - 'Every extra leading zero multiplies the expected number of tries by 16.'
+  - 'Checking a solution takes a single hash: the work is hard to do and easy to verify.'
+  - 'Bitcoin adjusts its target every 2016 blocks to keep about one block every ten minutes.'
+widget: mining
+sources:
+  - title: 'Satoshi Nakamoto, Bitcoin: A Peer-to-Peer Electronic Cash System (2008), section 4'
+    url: 'https://bitcoin.org/bitcoin.pdf'
+  - title: 'Bitcoin Developer Reference: block headers and the target'
+    url: 'https://developer.bitcoin.org/reference/block_chain.html'
+  - title: 'ethereum.org: Proof-of-work (PoW)'
+    url: 'https://ethereum.org/en/developers/docs/consensus-mechanisms/pow/'
+---
+
+## A lottery played with hashes
+
+Hashes are unpredictable (lesson 1), so there is no way to calculate which nonce will give a hash that starts with zeros. A miner changes the nonce, hashes, checks, and repeats. Each hex character is one of 16 values, so a hash starts with one zero once in 16 tries on average, with two zeros once in 256, and with five zeros once in about a million.
+
+<Widget />
+
+Run the widget a few times at the same difficulty: the number of attempts varies a lot from run to run, but on average it follows the dashed line. Then add a zero and watch the cost grow about sixteen times.
+
+## Hard to do, easy to check
+
+Finding the nonce took thousands of hashes; anyone can check it with just one. That asymmetry is the whole point. To change an old block, an attacker must redo its proof of work and the work of every block after it (lesson 2), while the honest network keeps adding new blocks on top. Lesson 6 computes the attacker’s chances.
+
+## The difficulty adjusts
+
+In Bitcoin the target is not a number of zeros but a 256-bit number: the block’s header hash, read as a number, must be lower than the target. Every 2016 blocks the network recalculates the target, so that blocks keep arriving about every ten minutes however much computing power joins or leaves.
+
+<Note label="Simplification">
+  Here the difficulty counts leading hex zeros and the text hashed is `data|nonce`. Bitcoin compares
+  the double SHA-256 of an 80-byte header with a target stored in a compact form. Ethereum stopped
+  using proof of work in September 2022 and now uses proof of stake (lesson 6).
+</Note>
