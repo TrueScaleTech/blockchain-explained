@@ -162,8 +162,9 @@ a {
 /* ---------- Masthead ---------- */
 
 .mast {
-  background: var(--bar);
-  color: var(--on-bar);
+  background: var(--ground);
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule);
 }
 .mast .wrap {
   display: flex;
@@ -171,7 +172,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 6px 24px;
-  min-height: 52px;
+  min-height: 56px;
 }
 .brand {
   display: flex;
@@ -182,60 +183,60 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-decoration: none;
-  color: var(--on-bar);
+  color: var(--ink);
 }
+/* The mark is three linked blocks, the last one filled with the marker. */
 .brand svg {
   width: 46px;
   height: 14px;
   flex: none;
-  color: var(--amber);
+  color: var(--ink);
   overflow: visible;
 }
-/* The mark is three linked blocks; the links draw themselves in once, when the page opens. */
-.brand .link {
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-dasharray: 8;
-  animation: link 0.7s var(--ease-out) 0.15s both;
+.brand svg rect {
+  fill: none;
 }
-.brand .link + .link {
-  animation-delay: 0.35s;
-}
-@keyframes link {
-  from {
-    stroke-dashoffset: 8;
-  }
+.brand svg .tip {
+  fill: var(--amber);
 }
 .mast nav {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 2px 22px;
   font: 500 0.8125rem/1 var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+@media (max-width: 26rem) {
+  .mast nav {
+    gap: 2px 14px;
+    letter-spacing: 0.04em;
+  }
+}
 .mast nav a {
   padding: 10px 0;
   text-decoration: none;
-  color: var(--on-bar);
+  color: var(--quiet);
   border-bottom: 2px solid transparent;
 }
-.mast nav a:hover,
-.mast nav a[aria-current='page'] {
-  border-bottom-color: var(--amber);
+.mast nav a:hover {
+  color: var(--ink);
 }
-.mast :focus-visible {
-  outline-color: var(--amber);
+.mast nav a[aria-current='page'] {
+  color: var(--ink);
+  border-bottom-color: var(--amber);
 }
 .lang {
   display: flex;
   gap: 8px;
 }
 .lang .code {
-  color: var(--bar-quiet);
+  color: var(--quiet);
 }
 .lang .code[data-current='true'] {
-  color: var(--on-bar);
+  color: var(--ink);
+  font-weight: 700;
 }
 .theme {
   display: grid;
@@ -244,13 +245,13 @@ a {
   height: 40px;
   margin-right: -8px;
   padding: 0;
-  color: var(--on-bar);
+  color: var(--ink);
   background: transparent;
   border: 0;
   cursor: pointer;
 }
 .theme:hover {
-  color: var(--amber);
+  color: var(--quiet);
 }
 .theme[hidden] {
   display: none;

@@ -166,13 +166,13 @@ A cool-paper neutral field with ink text, one amber marker, and vermilion held b
 - **Cool Paper** (#f4f5f7): page ground.
 - **Sheet White** (#ffffff): figure body and fields.
 - **Well Grey** (#eceef2): readouts, chain blocks, the sunken ground inside a figure.
-- **Spec Ink** (#101418): text, 1-2px structural rules, the masthead bar, primary button fill.
+- **Spec Ink** (#101418): text, 1-2px structural rules, the primary button fill and the figure caption bar.
 - **Quiet Slate** (#4a5260): secondary text, labels, button hover fill.
 - **Past Slate** (#626a78): lessons already behind the reader in the contents.
 - **Hairline** (#c9ccd3): row dividers and section rules.
 - **Control Line** (#7b8391): field borders, inactive edges, link underlines.
 - **Mark Wash** (#e4e7ec): inline code ground and chip hover.
-- **Masthead Quiet** (#a9b0bd): secondary text on the ink bar.
+- **Masthead Quiet** (#a9b0bd): secondary text on the ink caption bar of a figure.
 
 ### Status
 
@@ -231,7 +231,7 @@ Square. Every control, field, chip, block and figure has 0 radius. The only roun
 - **Ghost:** transparent with an ink border; hover fills Well Grey.
 - **Busy:** amber fill with ink text and a progress cursor (it marks what is happening now).
 - **Disabled:** 45% opacity, transparent, Control Line border.
-- **Focus:** 2px ink outline (amber on the masthead), 2-3px offset.
+- **Focus:** 2px ink outline, 2-3px offset.
 
 ### Chips
 
@@ -260,7 +260,7 @@ Square. Every control, field, chip, block and figure has 0 radius. The only roun
 
 ### Navigation
 
-- **Masthead:** ink bar, 52px minimum, brand left (brand mark, then wordmark in Archivo uppercase 700, width 92%), mono uppercase links right. The current page and hovered links take a 2px amber underline. IT|EN is one link; the theme toggle is a 40px sun/moon icon button shown only when scripting runs.
+- **Masthead:** the same ground colour as the page, with one hairline rule under it, 56px minimum. Brand left (a static mark of three linked blocks, the last filled with amber, then the wordmark in Archivo uppercase 700, width 92%), mono uppercase links right in quiet ink; the current page takes a 2px amber underline. The links wrap on very narrow screens. Nothing in it animates. IT|EN is one link; the theme toggle is a 40px sun/moon icon button shown only when scripting runs.
 - **Contents:** numbered mono list; the current item is ink, bold, with a full-width 3px amber rule drawn from the left on hover and held on the current item; finished lessons dim to Past Slate. No leaders, no page numbers.
 - **Pager:** two plain text links with mono direction labels; the destination takes an amber rule on hover.
 

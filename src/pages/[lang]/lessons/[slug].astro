@@ -60,10 +60,6 @@ const href = (l: Lesson) => `${base}/${locale}/lessons/${slugOf(l)}/`;
           <dd>{t.siteTitle}</dd>
         </div>
         <div>
-          <dt>{t.hdrCategory}</dt>
-          <dd>{t.hdrCategoryValue}</dd>
-        </div>
-        <div>
           <dt>{t.hdrLesson}</dt>
           <dd>
             {pad(lesson.data.order)} {t.of} {pad(lessons.length)}
@@ -72,10 +68,6 @@ const href = (l: Lesson) => `${base}/${locale}/lessons/${slugOf(l)}/`;
         <div>
           <dt>{t.hdrEdition}</dt>
           <dd>{edition}</dd>
-        </div>
-        <div>
-          <dt>{t.hdrLanguage}</dt>
-          <dd>{t.hdrLanguageValue}</dd>
         </div>
         <div>
           <dt>{t.hdrReferences}</dt>

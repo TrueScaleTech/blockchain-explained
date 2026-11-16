@@ -29,10 +29,6 @@ interface Strings {
   of: string;
   hdrSeries: string;
   hdrLesson: string;
-  hdrCategory: string;
-  hdrCategoryValue: string;
-  hdrLanguage: string;
-  hdrLanguageValue: string;
   hdrEdition: string;
   hdrReferences: string;
   limitsTitle: string;
@@ -77,10 +73,6 @@ export const STRINGS: Record<Locale, Strings> = {
     of: 'of',
     hdrSeries: 'Series',
     hdrLesson: 'Lesson',
-    hdrCategory: 'Category',
-    hdrCategoryValue: 'Educational',
-    hdrLanguage: 'Language',
-    hdrLanguageValue: 'English',
     hdrEdition: 'Edition',
     hdrReferences: 'References',
     limitsTitle: 'Limits',
@@ -118,10 +110,6 @@ export const STRINGS: Record<Locale, Strings> = {
         body: 'No cookies, no analytics, no third-party scripts, fonts or images: the pages load only their own files. The keys in the signature demo are created in memory, cannot be exported and disappear when you leave the page. If you choose a theme with the toggle, that choice is saved only in your own browser.',
       },
       {
-        heading: 'How it was written',
-        body: 'The texts were written with the help of an AI assistant, in a neutral textbook style. Each lesson lists the primary sources it is based on; if you find a mistake, please open an issue on GitHub.',
-      },
-      {
         heading: 'Independence',
         body: 'This is an independent educational project. It is not affiliated with or endorsed by any blockchain project, foundation or company.',
       },
@@ -149,10 +137,6 @@ export const STRINGS: Record<Locale, Strings> = {
     of: 'di',
     hdrSeries: 'Serie',
     hdrLesson: 'Lezione',
-    hdrCategory: 'Categoria',
-    hdrCategoryValue: 'Didattica',
-    hdrLanguage: 'Lingua',
-    hdrLanguageValue: 'Italiano',
     hdrEdition: 'Edizione',
     hdrReferences: 'Riferimenti',
     limitsTitle: 'Limiti',
@@ -188,10 +172,6 @@ export const STRINGS: Record<Locale, Strings> = {
       {
         heading: 'Privacy',
         body: 'Nessun cookie, nessuna analisi, nessuno script, font o immagine di terzi: le pagine caricano solo i propri file. Le chiavi della dimostrazione delle firme sono create in memoria, non si possono esportare e spariscono quando lasci la pagina. Se scegli un tema con l’interruttore, la scelta resta solo nel tuo browser.',
-      },
-      {
-        heading: 'Come è stato scritto',
-        body: 'I testi sono stati scritti con l’aiuto di un assistente AI, in stile neutro da manuale. Ogni lezione elenca le fonti primarie su cui si basa; se trovi un errore, apri una segnalazione su GitHub.',
       },
       {
         heading: 'Indipendenza',

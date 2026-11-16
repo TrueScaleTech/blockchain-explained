@@ -38,7 +38,8 @@ const pageDescription = description ?? t.tagline;
       http-equiv="Content-Security-Policy"
       content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"
     />
-    <meta name="theme-color" content="#101418" />
+    <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="alternate" hreflang={locale} href={`${base}/${locale}/${path}`} />
     <link rel="alternate" hreflang={other} href={`${base}/${other}/${path}`} />
@@ -62,8 +63,8 @@ const pageDescription = description ?? t.tagline;
               fill="currentColor"
               stroke="currentColor"
             ></rect>
-            <line class="link" x1="10" y1="7" x2="18" y2="7"></line>
-            <line class="link" x1="28" y1="7" x2="36" y2="7"></line>
+            <line x1="10" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="2"></line>
+            <line x1="28" y1="7" x2="36" y2="7" stroke="currentColor" stroke-width="2"></line>
           </svg>
           {t.siteTitle}
         </a>

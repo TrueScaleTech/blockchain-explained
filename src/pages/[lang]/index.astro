@@ -13,6 +13,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const lessons = await getLessons(locale);
 const first = lessons[0];
 const pad = (n: number) => String(n).padStart(2, '0');
+const edition = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(
+  new Date(),
+);
 ---
 
 <Base locale={locale} path="" current="lessons">
@@ -23,16 +26,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
         <dd>{t.siteTitle}</dd>
       </div>
       <div>
-        <dt>{t.hdrCategory}</dt>
-        <dd>{t.hdrCategoryValue}</dd>
-      </div>
-      <div>
-        <dt>{t.contents}</dt>
-        <dd>{pad(lessons.length)}</dd>
-      </div>
-      <div>
-        <dt>{t.hdrLanguage}</dt>
-        <dd>{t.hdrLanguageValue}</dd>
+        <dt>{t.hdrEdition}</dt>
+        <dd>{edition}</dd>
       </div>
     </dl>
     <section class="lead">
