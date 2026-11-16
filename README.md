@@ -3,6 +3,8 @@
 [![CI](https://github.com/TrueScaleTech/blockchain-explained/actions/workflows/ci.yml/badge.svg)](https://github.com/TrueScaleTech/blockchain-explained/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+**Live site:** <https://truescaletech.github.io/blockchain-explained/>
+
 How a blockchain works, explained in six short lessons you can operate: hashing, blocks and the chain, mining, Merkle trees, digital signatures, and consensus with the 51% attack. Each lesson pairs a few minutes of theory with a widget that computes real values in your browser. The site is static and bilingual (English and Italian).
 
 ![Lesson 2: editing block 2 breaks it and every block after it](docs/images/chain-widget.png)
