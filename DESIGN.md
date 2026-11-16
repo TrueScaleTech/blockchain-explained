@@ -260,7 +260,7 @@ Square. Every control, field, chip, block and figure has 0 radius. The only roun
 
 ### Navigation
 
-- **Masthead:** the same ground colour as the page, with one hairline rule under it, 56px minimum. Brand left (a static mark of three linked blocks, the last filled with amber, then the wordmark in Archivo uppercase 700, width 92%), mono uppercase links right in quiet ink; the current page takes a 2px amber underline. The links wrap on very narrow screens. Nothing in it animates. IT|EN is one link; the theme toggle is a 40px sun/moon icon button shown only when scripting runs.
+- **Masthead:** the same ground colour as the page, with one hairline rule under it, 56px minimum. Brand left (a static mark of three linked amber blocks, the last one filled (darker gold in the light theme), then the wordmark in Archivo uppercase 700, width 92%), mono uppercase links right in quiet ink; the current page takes a 2px amber underline. The links wrap on very narrow screens. Nothing in it animates. IT|EN is one link; the theme toggle is a 40px sun/moon icon button shown only when scripting runs.
 - **Contents:** numbered mono list; the current item is ink, bold, with a full-width 3px amber rule drawn from the left on hover and held on the current item; finished lessons dim to Past Slate. No leaders, no page numbers.
 - **Pager:** two plain text links with mono direction labels; the destination takes an amber rule on hover.
 

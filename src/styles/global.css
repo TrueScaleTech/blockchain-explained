@@ -185,19 +185,14 @@ a {
   text-decoration: none;
   color: var(--ink);
 }
-/* The mark is three linked blocks, the last one filled with the marker. */
+/* The mark is three linked blocks in amber, the last one filled. (In the light theme the
+   darker gold keeps it visible on the pale ground.) */
 .brand svg {
   width: 46px;
   height: 14px;
   flex: none;
-  color: var(--ink);
+  color: var(--amber-rule);
   overflow: visible;
-}
-.brand svg rect {
-  fill: none;
-}
-.brand svg .tip {
-  fill: var(--amber);
 }
 .mast nav {
   display: flex;
