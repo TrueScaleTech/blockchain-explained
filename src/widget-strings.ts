@@ -33,7 +33,7 @@ const en = {
     datas: ['Alice pays Bob 5', 'Bob pays Carol 2', 'Carol pays Dan 1', 'Dan pays Erin 3'],
   },
   mining: {
-    title: 'Proof of work',
+    title: 'Proof Of Work',
     hint: 'Pick a difficulty, then mine',
     data: 'Block data',
     start: 'Block 7: Alice pays Bob 5',
@@ -142,7 +142,7 @@ const it: typeof en = {
     datas: ['Alice paga Bob 5', 'Bob paga Carol 2', 'Carol paga Dan 1', 'Dan paga Erin 3'],
   },
   mining: {
-    title: 'Proof of work',
+    title: 'Proof Of Work',
     hint: 'Scegli la difficoltà, poi mina',
     data: 'Dati del blocco',
     start: 'Blocco 7: Alice paga Bob 5',

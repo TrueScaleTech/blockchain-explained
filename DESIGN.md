@@ -208,11 +208,11 @@ A cool-paper neutral field with ink text, one amber marker, and vermilion held b
 
 ## Layout
 
-A document frame: a 15.5rem contents column and the document column, inside a 92rem container with a fluid gutter (16px to 48px). Below 56rem the frame collapses to one column and contents becomes a two-column list at the top (sections list hidden). From 88rem a third column of 14.5rem appears to the right, holding the key points sticky beside the text and the limits box. The reading measure is 66ch; figures run up to 56rem and size their internals with container queries (chains go 1, 2, then 4 columns at 30rem and 44rem of figure width). Vertical rhythm is rule-led: 2.4em above section headings with a 1px hairline, a 2px ink rule opening the header block, the pager and the footer. The header block is a two-column tabular mono grid that stacks below 36rem. Touch targets are 40px or more (44px for buttons).
+A document frame: a 15.5rem contents column and the document column, inside a 92rem container with a fluid gutter (16px to 48px). Below 56rem the frame collapses to one column and contents becomes a two-column list at the top (sections list hidden). From 88rem a third column of 14.5rem appears to the right, holding the key points sticky beside the text and the limits box. The reading measure is 66ch; figures run up to 56rem and size their internals with container queries (chains go 1, 2, then 4 columns at 30rem and 44rem of figure width). Vertical rhythm is rule-led: 2.4em above section headings with a 1px hairline, a 2px ink rule closing the header block (under its text) and opening the pager and the footer. The header block is a two-column tabular mono grid that stacks below 36rem. Touch targets are 40px or more (44px for buttons).
 
 ## Elevation & Depth
 
-Flat. There are no shadows. Depth is conveyed by ground steps (paper figure on cool-paper page, well grey sunken inside the figure) and by rules: a 1px ink border around a figure, a 2px ink top rule on notes and the header block. The one `box-shadow` in the build is an inset 1px ring inside a status glyph for the failed state. Diagrams use hatch and dashes (expected line dashed, ghost nodes dashed) instead of lift.
+Flat. There are no shadows. Depth is conveyed by ground steps (paper figure on cool-paper page, well grey sunken inside the figure) and by rules: a 1px ink border around a figure, a 2px ink top rule on notes and a 2px ink bottom rule under the header block. The one `box-shadow` in the build is an inset 1px ring inside a status glyph for the failed state. Diagrams use hatch and dashes (expected line dashed, ghost nodes dashed) instead of lift.
 
 ### Named Rules
 

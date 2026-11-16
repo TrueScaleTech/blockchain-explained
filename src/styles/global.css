@@ -452,8 +452,8 @@ a {
   gap: 2px 24px;
   margin: 0 0 clamp(22px, 3vw, 34px);
   padding: 9px 0;
-  border-top: 2px solid var(--ink);
-  border-bottom: 1px solid var(--rule);
+  border-top: 1px solid var(--rule);
+  border-bottom: 2px solid var(--ink);
   font: 400 0.78rem/1.7 var(--mono);
 }
 .hdr div {
